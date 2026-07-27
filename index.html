@@ -130,6 +130,8 @@ body.authed #loginGate{display:none;}
 .heat-cell.h1{background:var(--yellow);color:#111827;}
 .heat-cell.h2{background:var(--blue);color:#fff;}
 .heat-cell.h3{background:var(--green);color:#fff;}
+.heat-cell.spill{outline:2px dashed rgba(255,255,255,.6);outline-offset:-4px;}
+.heat-cell.spill .d{font-size:14px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{text-align:left;padding:9px 10px;color:var(--text-2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
 td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
@@ -248,6 +250,7 @@ tr:last-child td{border-bottom:none;}
             <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — 1 cirurgia</span>
             <span><span class="dot" style="background:var(--blue)"></span>Azul — 2 cirurgias</span>
             <span><span class="dot" style="background:var(--green)"></span>Verde — 3 cirurgias (lotado)</span>
+            <span><span class="dot" style="border:2px dashed var(--text-2);background:transparent"></span>Borda tracejada — dia já é de agosto, mostrado aqui para completar a última semana de julho</span>
           </div>
         </div>
         <div class="panel">
@@ -319,7 +322,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-07-27 11:15 — Releitura criteriosa a pedido de Karina encontrou paciente João Pedro (13.900, 10x, F/A) incluído no dia 31/07, que não tinha sido capturado antes. Vagas em aberto agora calculadas dinamicamente. Também confirmado: cancelamento de Maicon Praxedes (27/07) e inclusões de Eucy Pinheiro e Carlos Júnior (30/07). Agosto — sem novidades desde 24/07 11:42.";
+const LAST_UPDATE = "2026-07-27 11:45 — Heatmap de julho agora preenche a virada de mês: dia 1/08 aparece na última semana (S5) quando cair no meio da semana, em vez de ficar em branco. Também: paciente João Pedro incluído no dia 31/07, vagas em aberto calculadas dinamicamente, cancelamento de Maicon Praxedes (27/07) e inclusões de Eucy Pinheiro e Carlos Júnior (30/07). Agosto — sem novidades desde 24/07 11:42.";
 const TODAY = "2026-07-27";
 
 const surgeries = [
@@ -461,7 +464,8 @@ const history = [
 {ts:"26/07 16:00",author:"João Pedro Closer Capi Hair",type:"Cancelamento (Julho) — pendente de identificação",msg:"Retirando paciente de segunda da agenda pois eletroforese não saiu — mensagem não identifica o nome do paciente. O dia 27/07 (segunda) segue com os 3 pacientes atualmente cadastrados (Jorge Henrique, Sandro Caldeira, Maicon Praxedes); nenhum registro foi removido automaticamente. Verificar manualmente com a equipe qual paciente deve ser retirado do dia 27/07."},
 {ts:"27/07 10:25",author:"Karina (confirmação manual)",type:"Cancelamento (Julho) — pendência resolvida",msg:"Confirmado que o paciente retirado da agenda do dia 27/07 (mensagem de 26/07 16:00, 'eletroforese não saiu') é Maicon Praxedes. Status alterado para Cancelado. Dia 27/07 passa de 3 para 2 cirurgias (Jorge Henrique e Sandro Caldeira)."},
 {ts:"27/07 09:40",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome reconectada. Grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO' relidos com sucesso. Julho: inclusão de Eucy Pinheiro e Carlos Júnior (30/07) aplicadas acima; pendência de cancelamento não identificado no dia 27/07 registrada acima. Agosto: última mensagem continua sendo a de 24/07 11:42 (João Pedro Closer Capi Hair, 'Dia 20 com 3'), sem novidades."},
-{ts:"27/07 11:15",author:"Sistema (releitura criteriosa solicitada por Karina)",type:"Correção — inclusão retroativa (Julho)",msg:"A pedido de Karina, releitura completa e criteriosa de todas as mensagens do grupo Julho desde 24/07 (sexta-feira) até o momento. Encontrada a inclusão de João Pedro no dia 31/07 (ver acima), que não tinha sido capturada nas verificações anteriores por não ter mensagem curta de aviso associada. Também corrigido o mapa de 'vagas em aberto', que era um valor fixo desatualizado — passou a ser calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas)."}
+{ts:"27/07 11:15",author:"Sistema (releitura criteriosa solicitada por Karina)",type:"Correção — inclusão retroativa (Julho)",msg:"A pedido de Karina, releitura completa e criteriosa de todas as mensagens do grupo Julho desde 24/07 (sexta-feira) até o momento. Encontrada a inclusão de João Pedro no dia 31/07 (ver acima), que não tinha sido capturada nas verificações anteriores por não ter mensagem curta de aviso associada. Também corrigido o mapa de 'vagas em aberto', que era um valor fixo desatualizado — passou a ser calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas)."},
+{ts:"27/07 11:45",author:"Sistema (ajuste solicitado por Karina)",type:"Melhoria — heatmap (Julho)",msg:"A pedido de Karina: quando a última semana do heatmap de julho (S5) termina no meio (não chega até sábado), as células restantes passam a ser preenchidas com os primeiros dias de agosto (ex.: sábado 01/08), usando os dados reais de surgeriesAgosto, em vez de ficarem em branco. Essas células aparecem com borda tracejada para indicar que já são de agosto. O heatmap de agosto continua mostrando o dia 01/08 normalmente na sua própria grade (S1), sem prejuízo."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
@@ -683,28 +687,53 @@ function renderHeatmap(){
     const dow = new Date(2026,6,d).getDay(); // 0=Dom,1=Seg,...6=Sáb
     if(dow===0) continue; // domingo: clínica fechada, sem célula
     const idx = dow-1; // Seg=0 ... Sáb=5
-    current[idx] = d;
+    current[idx] = {d, spill:false};
     if(idx===5){ weeks.push(current); current = new Array(6).fill(null); }
   }
-  if(current.some(v=>v!==null)) weeks.push(current);
+  // Virada de mês: se a última semana de julho terminar no meio (não chega até sábado), preenche o restante
+  // com os primeiros dias de agosto (mesma semana Seg-Sáb), para a semana não ficar quebrada.
+  if(current.some(v=>v!==null)){
+    const augustCounts = computeAugustCounts();
+    let augDay = 1;
+    for(let i=0;i<6;i++){
+      if(current[i]===null){
+        while(new Date(2026,7,augDay).getDay()===0){ augDay++; } // pula domingo
+        current[i] = {d:augDay, spill:true};
+        augDay++;
+      }
+    }
+    weeks.push(current);
+  }
 
   const todayDay = parseInt(TODAY.slice(8,10));
-  const currentWeekIdx = weeks.findIndex(w=>w.includes(todayDay));
+  const currentWeekIdx = weeks.findIndex(w=>w.some(c=>c && !c.spill && c.d===todayDay));
   const nextWeekIdx = currentWeekIdx>=0 ? currentWeekIdx+1 : -1;
 
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
   let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div></div>`;
 
   let rowsHtml = '';
+  const augustCounts2 = computeAugustCounts();
   weeks.forEach((weekCells,w)=>{
     let weekTotal = 0;
-    const dayCells = weekCells.map(d=>{
-      if(d===null) return `<div class="heat-cell blank"></div>`;
-      const key = `2026-07-${String(d).padStart(2,'0')}`;
-      const count = byDate[key]||0;
+    const dayCells = weekCells.map(c=>{
+      if(c===null) return `<div class="heat-cell blank"></div>`;
+      let count, key, dLabel, spillCls;
+      if(c.spill){
+        key = `2026-08-${String(c.d).padStart(2,'0')}`;
+        count = augustCounts2[key]||0;
+        dLabel = `${c.d}/08`;
+        spillCls = ' spill';
+      } else {
+        key = `2026-07-${String(c.d).padStart(2,'0')}`;
+        count = byDate[key]||0;
+        dLabel = c.d;
+        spillCls = '';
+      }
       weekTotal += count;
       const cls = count>=3 ? 'h3' : count===2 ? 'h2' : count===1 ? 'h1' : 'h0';
-      return `<div class="heat-cell ${cls}" title="${fmtDate(key)}: ${count} cirurgia(s)"><span class="d">${d}</span><span class="c">${count}</span></div>`;
+      const titleDate = c.spill ? `${fmtDate(key)} (agosto)` : fmtDate(key);
+      return `<div class="heat-cell ${cls}${spillCls}" title="${titleDate}: ${count} cirurgia(s)"><span class="d">${dLabel}</span><span class="c">${count}</span></div>`;
     }).join('');
     let rowClass = 'heatmap-row';
     let tag = '';
