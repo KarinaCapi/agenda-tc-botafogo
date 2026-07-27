@@ -108,14 +108,21 @@ body.authed #loginGate{display:none;}
 .chart-box h4{margin:0 0 10px;font-size:12.5px;font-weight:700;color:var(--text-2);}
 .chart-box canvas{max-height:230px;}
 .heatmap-wrap{display:flex;flex-direction:column;gap:8px;max-width:none;}
-.heatmap-header{display:grid;grid-template-columns:78px repeat(6,1fr) 72px;gap:8px;}
+.heatmap-header{display:grid;grid-template-columns:78px repeat(6,1fr) 72px 100px;gap:8px;}
 .heatmap-header .hh{font-size:12px;font-weight:700;color:var(--text-2);text-align:center;text-transform:uppercase;letter-spacing:.03em;padding-bottom:2px;}
-.heatmap-row{display:grid;grid-template-columns:78px repeat(6,1fr) 72px;gap:8px;padding:2px;border-radius:12px;}
+.heatmap-row{display:grid;grid-template-columns:78px repeat(6,1fr) 72px 100px;gap:8px;padding:2px;border-radius:12px;}
 .week-occ{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60px;border-radius:10px;background:var(--panel-2);font-weight:800;font-size:15px;line-height:1.1;}
 .week-occ .pct-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.85;margin-top:2px;}
 .week-occ.occ-high{background:var(--green-bg);color:var(--green);}
 .week-occ.occ-mid{background:var(--yellow-bg);color:#a16207;}
 .week-occ.occ-low{background:var(--red-bg);color:var(--red);}
+.week-meta{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60px;border-radius:10px;background:var(--panel-2);line-height:1.15;text-align:center;padding:2px 4px;}
+.week-meta .meta-line{font-size:12px;font-weight:800;}
+.week-meta .meta-sub{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.02em;opacity:.85;margin-top:2px;}
+.week-meta.meta-hit{background:var(--green-bg);color:var(--green);}
+.week-meta.meta-warn{background:var(--yellow-bg);color:#a16207;}
+.week-meta.meta-miss{background:var(--red-bg);color:var(--red);}
+.week-meta.meta-na{background:var(--panel-2);color:var(--text-2);}
 .heatmap-row.current-week{outline:2px solid var(--accent);}
 .heatmap-row.next-week{outline:2px dashed var(--accent-2);}
 .week-label{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-2);background:var(--panel-2);border-radius:10px;line-height:1.2;text-align:center;height:60px;}
@@ -322,7 +329,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-07-27 15:13 — Verificação automática: sem novidades nos grupos Julho (última mensagem 26/07 16:00) e Agosto (última mensagem 24/07 11:42) desde a leitura anterior.";
+const LAST_UPDATE = "2026-07-27 15:31 — A pedido de Karina: nova coluna 'Meta' nos heatmaps de Julho e Agosto, com meta de ocupação por semana (semana atual = 100%/18, +1 semana = 75%/14, +2 semanas = 50%/9, ciclo se repete a cada 3 semanas) e quantas cirurgias faltam para bater a meta.";
 const TODAY = "2026-07-27";
 
 const surgeries = [
@@ -466,7 +473,8 @@ const history = [
 {ts:"27/07 09:40",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome reconectada. Grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO' relidos com sucesso. Julho: inclusão de Eucy Pinheiro e Carlos Júnior (30/07) aplicadas acima; pendência de cancelamento não identificado no dia 27/07 registrada acima. Agosto: última mensagem continua sendo a de 24/07 11:42 (João Pedro Closer Capi Hair, 'Dia 20 com 3'), sem novidades."},
 {ts:"27/07 11:15",author:"Sistema (releitura criteriosa solicitada por Karina)",type:"Correção — inclusão retroativa (Julho)",msg:"A pedido de Karina, releitura completa e criteriosa de todas as mensagens do grupo Julho desde 24/07 (sexta-feira) até o momento. Encontrada a inclusão de João Pedro no dia 31/07 (ver acima), que não tinha sido capturada nas verificações anteriores por não ter mensagem curta de aviso associada. Também corrigido o mapa de 'vagas em aberto', que era um valor fixo desatualizado — passou a ser calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas)."},
 {ts:"27/07 11:45",author:"Sistema (ajuste solicitado por Karina)",type:"Melhoria — heatmap (Julho)",msg:"A pedido de Karina: quando a última semana do heatmap de julho (S5) termina no meio (não chega até sábado), as células restantes passam a ser preenchidas com os primeiros dias de agosto (ex.: sábado 01/08), usando os dados reais de surgeriesAgosto, em vez de ficarem em branco. Essas células aparecem com borda tracejada para indicar que já são de agosto. O heatmap de agosto continua mostrando o dia 01/08 normalmente na sua própria grade (S1), sem prejuízo."},
-{ts:"27/07 15:13",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 26/07 16:00, João Pedro Closer Capi Hair, 'Retirando paciente de segunda da agenda pois eletroforese não saiu', já registrada e resolvida em 27/07 10:25 como cancelamento de Maicon Praxedes) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 24/07 11:42, João Pedro Closer Capi Hair, 'Dia 20 com 3'). Nenhuma mensagem nova em nenhum dos dois grupos."}
+{ts:"27/07 15:13",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 26/07 16:00, João Pedro Closer Capi Hair, 'Retirando paciente de segunda da agenda pois eletroforese não saiu', já registrada e resolvida em 27/07 10:25 como cancelamento de Maicon Praxedes) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 24/07 11:42, João Pedro Closer Capi Hair, 'Dia 20 com 3'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"27/07 15:31",author:"Sistema (ajuste solicitado por Karina)",type:"Melhoria — meta de ocupação (Julho + Agosto)",msg:"A pedido de Karina: adicionada coluna 'Meta' após a coluna de Ocupação nos heatmaps de Julho e Agosto. Regra definida por Karina: semana atual = meta de 100% (18 cirurgias); 1 semana à frente = 75% (14); 2 semanas à frente = 50% (9); a partir da 3ª semana à frente o ciclo 100%→75%→50% se repete indefinidamente. A célula mostra a meta da semana e quantas cirurgias faltam para atingi-la (ou 'meta batida' quando já atingida); semanas já encerradas não recebem meta (célula com '—')."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
@@ -484,6 +492,38 @@ function computeAugustCounts(){
   const counts = {};
   surgeriesAgosto.forEach(s=>{ counts[s.date] = (counts[s.date]||0) + 1; });
   return counts;
+}
+
+// ---------------- METAS DE OCUPAÇÃO SEMANAL ----------------
+// Regra (a pedido de Karina): semana atual = meta 100% (18 cirurgias); +1 semana = 75% (14); +2 semanas = 50% (9);
+// a partir da +3ª semana o ciclo 100% → 75% → 50% se repete indefinidamente.
+// "offset" = quantas semanas a semana em questão está à frente da semana atual (0 = semana atual). Semanas passadas (offset<0) não recebem meta.
+function mondayOf(year, monthIdx, day){
+  const dt = new Date(year, monthIdx, day);
+  const dow = dt.getDay(); // 0=Dom..6=Sáb
+  const shift = (dow+6)%7; // Seg=0 ... Dom=6
+  dt.setDate(dt.getDate()-shift);
+  return dt;
+}
+function weekTargetInfo(offset){
+  if(offset===null || offset===undefined || offset<0) return null;
+  const pos = offset % 3;
+  const pct = pos===0 ? 100 : pos===1 ? 75 : 50;
+  const target = Math.round(18*pct/100);
+  return {pct,target};
+}
+function metaCellHtml(weekTotal, offset){
+  const info = weekTargetInfo(offset);
+  if(!info){
+    return `<div class="week-meta meta-na" title="Semana já concluída — fora do período de acompanhamento de metas"><span class="meta-line">—</span><span class="meta-sub">meta</span></div>`;
+  }
+  const gap = info.target - weekTotal;
+  if(gap<=0){
+    return `<div class="week-meta meta-hit" title="Meta de ${info.pct}% (${info.target} cirurgias) atingida — ${weekTotal} agendadas"><span class="meta-line">${info.pct}% · ${info.target}</span><span class="meta-sub">meta batida</span></div>`;
+  }
+  const ratio = weekTotal/info.target;
+  const cls = ratio>=0.7 ? 'meta-warn' : 'meta-miss';
+  return `<div class="week-meta ${cls}" title="Meta de ${info.pct}% (${info.target} cirurgias) — faltam ${gap} para bater a meta"><span class="meta-line">${info.pct}% · ${info.target}</span><span class="meta-sub">faltam ${gap}</span></div>`;
 }
 
 // ---------------- HELPERS ----------------
@@ -711,7 +751,7 @@ function renderHeatmap(){
   const nextWeekIdx = currentWeekIdx>=0 ? currentWeekIdx+1 : -1;
 
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div></div>`;
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
 
   let rowsHtml = '';
   const augustCounts2 = computeAugustCounts();
@@ -743,7 +783,9 @@ function renderHeatmap(){
     const pct = Math.round((weekTotal/18)*100);
     const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
     const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de 18 cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
-    rowsHtml += `<div class="${rowClass}"><div class="week-label">S${w+1}${tag}</div>${dayCells}${occCell}</div>`;
+    const weekOffset = currentWeekIdx>=0 ? (w-currentWeekIdx) : null;
+    const metaCell = metaCellHtml(weekTotal, weekOffset);
+    rowsHtml += `<div class="${rowClass}"><div class="week-label">S${w+1}${tag}</div>${dayCells}${occCell}${metaCell}</div>`;
   });
   document.getElementById('heatmap').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
 }
@@ -763,14 +805,20 @@ function renderHeatmapAgosto(){
   }
   if(current.some(v=>v!==null)) weeks.push(current);
 
+  // Semana atual (referência de hoje) para alinhar o ciclo de metas com o heatmap de julho
+  const [ty,tm,td] = TODAY.split('-').map(Number);
+  const currentMonday = mondayOf(ty, tm-1, td);
+
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div></div>`;
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
 
   let rowsHtml = '';
   weeks.forEach((weekCells,w)=>{
     let weekTotal = 0;
-    const dayCells = weekCells.map(d=>{
+    let weekMonday = null;
+    const dayCells = weekCells.map((d,i)=>{
       if(d===null) return `<div class="heat-cell blank"></div>`;
+      if(weekMonday===null){ const dt=new Date(2026,7,d); dt.setDate(dt.getDate()-i); weekMonday=dt; }
       const key = `2026-08-${String(d).padStart(2,'0')}`;
       const count = augustCounts[key]||0;
       weekTotal += count;
@@ -781,7 +829,9 @@ function renderHeatmapAgosto(){
     const pct = Math.round((weekTotal/18)*100);
     const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
     const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de 18 cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
-    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}</div>`;
+    const weekOffset = weekMonday ? Math.round((weekMonday-currentMonday)/(7*86400000)) : null;
+    const metaCell = metaCellHtml(weekTotal, weekOffset);
+    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}${metaCell}</div>`;
   });
   document.getElementById('heatmapAgosto').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
 }
