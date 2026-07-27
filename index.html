@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Executiva — TC Botafogo Julho</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#ffffff; --panel-2:#fafbfc; --border:#e5e7eb; --text:#111827; --text-2:#6b7280;
+  --accent:#4f46e5; --accent-2:#6366f1; --shadow:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.04);
+  --blue:#3b82f6; --green:#22c55e; --yellow:#eab308; --red:#ef4444; --purple:#a855f7;
+  --blue-bg:#eff6ff; --green-bg:#f0fdf4; --yellow-bg:#fefce8; --red-bg:#fef2f2; --purple-bg:#faf5ff;
+  --radius:14px;
+}
+body.dark{
+  --bg:#0f1115; --panel:#181b22; --panel-2:#1e222b; --border:#2a2f3a; --text:#f1f2f4; --text-2:#9aa0ac;
+  --accent:#818cf8; --accent-2:#a5b4fc; --shadow:0 1px 3px rgba(0,0,0,.4); --shadow-lg:0 10px 25px -5px rgba(0,0,0,.5);
+  --blue-bg:#132038; --green-bg:#0f2a1a; --yellow-bg:#2c2408; --red-bg:#2c1212; --purple-bg:#241234;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background .2s,color .2s;}
+a{color:inherit;}
+.app{display:none;flex-direction:column;min-height:100vh;}
+body.authed .app{display:flex;}
+#loginGate{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+body.authed #loginGate{display:none;}
+.login-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:36px 32px;width:100%;max-width:340px;text-align:center;}
+.login-card .lg-logo{font-size:34px;margin-bottom:6px;}
+.login-card h2{margin:0 0 4px;font-size:17px;font-weight:800;}
+.login-card p{margin:0 0 20px;font-size:12px;color:var(--text-2);}
+.login-card input{width:100%;padding:10px 12px;margin-bottom:10px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-size:13px;outline:none;box-sizing:border-box;}
+.login-card input:focus{border-color:var(--accent);}
+.login-card button{width:100%;padding:10px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-top:4px;}
+.login-error{display:none;color:var(--red);font-size:11.5px;margin-top:10px;}
+.topbar{display:flex;align-items:center;gap:16px;padding:14px 24px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;}
+.brand{display:flex;flex-direction:column;margin-right:8px;}
+.brand .title{font-weight:700;font-size:16px;letter-spacing:-.2px;}
+.brand .sub{font-size:11px;color:var(--text-2);}
+.search-wrap{flex:1;max-width:420px;position:relative;}
+.search-wrap input{width:100%;padding:9px 12px 9px 34px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-size:13px;outline:none;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5;font-size:13px;}
+.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.btn:hover{border-color:var(--accent);}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn.icon{padding:8px 9px;}
+.dropdown{position:relative;}
+.dropdown-menu{display:none;position:absolute;right:0;top:110%;background:var(--panel);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-lg);min-width:160px;overflow:hidden;z-index:60;}
+.dropdown-menu.show{display:block;}
+.dropdown-menu button{display:block;width:100%;text-align:left;padding:9px 12px;background:none;border:none;color:var(--text);font-size:12.5px;cursor:pointer;}
+.dropdown-menu button:hover{background:var(--panel-2);}
+.updated{font-size:11px;color:var(--text-2);margin-left:6px;white-space:nowrap;}
+.body-wrap{display:flex;flex:1;min-height:0;}
+.sidebar{width:260px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);padding:18px 14px;overflow-y:auto;overflow-x:hidden;transition:width .2s ease,padding .2s ease,opacity .15s ease;}
+.sidebar.collapsed{width:0;padding:18px 0;opacity:0;pointer-events:none;border-right:none;}
+.sidebar-reopen{display:none;align-items:center;justify-content:center;width:28px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);cursor:pointer;color:var(--text-2);font-size:13px;}
+.sidebar-reopen.show{display:flex;}
+.sidebar-reopen:hover{color:var(--accent);}
+.sidebar h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);margin:18px 0 8px;padding-left:2px;}
+.sidebar h4:first-child{margin-top:0;}
+.side-item{display:flex;justify-content:space-between;align-items:center;padding:8px 8px;border-radius:8px;font-size:12.5px;cursor:default;}
+.side-item:hover{background:var(--panel-2);}
+.side-item .n{font-weight:700;font-size:12px;padding:1px 7px;border-radius:20px;background:var(--panel-2);}
+.side-list{max-height:150px;overflow-y:auto;}
+.side-patient{padding:7px 8px;border-radius:8px;font-size:12px;}
+.side-patient:hover{background:var(--panel-2);}
+.side-patient .p-name{font-weight:600;}
+.side-patient .p-meta{color:var(--text-2);font-size:11px;}
+.main{flex:1;padding:20px 24px 40px;overflow-y:auto;min-width:0;}
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:20px;}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-.5px;}
+.kpi .l{font-size:11px;color:var(--text-2);margin-top:2px;font-weight:600;}
+.kpi.c-blue .v{color:var(--blue);} .kpi.c-green .v{color:var(--green);} .kpi.c-yellow .v{color:var(--yellow);}
+.kpi.c-red .v{color:var(--red);} .kpi.c-purple .v{color:var(--purple);} .kpi.c-ink .v{color:var(--accent);}
+.tabs{display:flex;gap:4px;background:var(--panel-2);padding:4px;border-radius:10px;width:fit-content;margin-bottom:16px;border:1px solid var(--border);}
+.tab{padding:7px 14px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--text-2);}
+.tab.active{background:var(--panel);color:var(--text);box-shadow:var(--shadow);}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:20px;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.panel-head h3{font-size:14px;margin:0;font-weight:700;}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.filters select{padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);font-size:12px;}
+.view-toggle{display:flex;gap:4px;margin-left:auto;background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:3px;}
+.view-toggle button{border:none;background:none;color:var(--text-2);font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;}
+.view-toggle button.active{background:var(--panel);color:var(--text);box-shadow:var(--shadow);}
+.day-group{margin-bottom:18px;}
+.day-title{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--border);}
+.day-title .today-flag{background:var(--accent);color:#fff;padding:1px 8px;border-radius:20px;font-size:10px;text-transform:none;letter-spacing:0;}
+.cards-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;}
+.card{border:1px solid var(--border);border-radius:12px;padding:12px 13px;background:var(--panel-2);position:relative;overflow:hidden;}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+.card.st-agendado::before{background:var(--blue);} .card.st-confirmado::before{background:var(--green);}
+.card.st-reagendado::before{background:var(--yellow);} .card.st-cancelado::before{background:var(--red);}
+.card.st-prioridade::before{background:var(--purple);}
+.card .name{font-weight:700;font-size:13px;margin-bottom:5px;padding-left:6px;}
+.card .row2{font-size:11.5px;color:var(--text-2);padding-left:6px;line-height:1.6;}
+.card .chip{display:inline-block;margin-top:7px;margin-left:6px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.chip.st-agendado{background:var(--blue-bg);color:var(--blue);} .chip.st-confirmado{background:var(--green-bg);color:var(--green);}
+.chip.st-reagendado{background:var(--yellow-bg);color:#a16207;} .chip.st-cancelado{background:var(--red-bg);color:var(--red);}
+.chip.st-prioridade{background:var(--purple-bg);color:var(--purple);}
+.empty-note{color:var(--text-2);font-size:12px;padding:10px 6px;}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.chart-box{background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;}
+.chart-box h4{margin:0 0 10px;font-size:12.5px;font-weight:700;color:var(--text-2);}
+.chart-box canvas{max-height:230px;}
+.heatmap-wrap{display:flex;flex-direction:column;gap:8px;max-width:none;}
+.heatmap-header{display:grid;grid-template-columns:78px repeat(6,1fr) 72px;gap:8px;}
+.heatmap-header .hh{font-size:12px;font-weight:700;color:var(--text-2);text-align:center;text-transform:uppercase;letter-spacing:.03em;padding-bottom:2px;}
+.heatmap-row{display:grid;grid-template-columns:78px repeat(6,1fr) 72px;gap:8px;padding:2px;border-radius:12px;}
+.week-occ{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60px;border-radius:10px;background:var(--panel-2);font-weight:800;font-size:15px;line-height:1.1;}
+.week-occ .pct-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.85;margin-top:2px;}
+.week-occ.occ-high{background:var(--green-bg);color:var(--green);}
+.week-occ.occ-mid{background:var(--yellow-bg);color:#a16207;}
+.week-occ.occ-low{background:var(--red-bg);color:var(--red);}
+.heatmap-row.current-week{outline:2px solid var(--accent);}
+.heatmap-row.next-week{outline:2px dashed var(--accent-2);}
+.week-label{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-2);background:var(--panel-2);border-radius:10px;line-height:1.2;text-align:center;height:60px;}
+.week-label .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.85;}
+.heatmap-row.current-week .week-label{background:var(--accent);color:#fff;}
+.heatmap-row.next-week .week-label{background:var(--accent-2);color:#fff;}
+.heat-cell{height:60px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-weight:700;gap:2px;}
+.heat-cell.blank{background:transparent;}
+.heat-cell .d{font-size:19px;line-height:1.1;}
+.heat-cell .c{font-size:11px;font-weight:600;opacity:.85;line-height:1.1;}
+.heat-cell.h0{background:var(--red);color:#fff;}
+.heat-cell.h1{background:var(--yellow);color:#111827;}
+.heat-cell.h2{background:var(--blue);color:#fff;}
+.heat-cell.h3{background:var(--green);color:#fff;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:9px 10px;color:var(--text-2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
+td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.badge-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--text-2);margin-top:10px;}
+.badge-legend span{display:inline-flex;align-items:center;gap:5px;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.footer-note{font-size:11px;color:var(--text-2);text-align:center;padding:18px 0 6px;}
+::-webkit-scrollbar{width:8px;height:8px;} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+@media print{.sidebar,.topbar .top-actions,.filters,.view-toggle{display:none!important;}}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(4,1fr);} .charts-grid{grid-template-columns:1fr;}}
+@media (max-width:800px){.sidebar{display:none;} .kpis{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div id="loginGate">
+  <div class="login-card">
+    <div class="lg-logo">🗓️</div>
+    <h2>TC Botafogo — Acesso restrito</h2>
+    <p>Capi Hair · Agenda executiva de cirurgias</p>
+    <form id="loginForm">
+      <input type="text" id="loginUser" placeholder="Usuário" autocomplete="username" required>
+      <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" required>
+      <button type="submit">Entrar</button>
+      <div class="login-error" id="loginError">Usuário ou senha incorretos.</div>
+    </form>
+  </div>
+</div>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="title">🗓️ TC Botafogo — Agenda Julho</div>
+      <div class="sub">Capi Hair · Grupo WhatsApp "AGENDA TC BOTAFOGO JULHO"</div>
+    </div>
+    <div class="search-wrap">
+      <span class="icon">🔍</span>
+      <input id="searchInput" placeholder="Buscar paciente, médico, hospital, procedimento ou data...">
+    </div>
+    <div class="top-actions">
+      <span class="updated" id="updatedLabel"></span>
+      <div class="dropdown">
+        <button class="btn icon" id="exportBtn">⬇ Exportar</button>
+        <div class="dropdown-menu" id="exportMenu">
+          <button onclick="exportCSV()">Exportar CSV</button>
+          <button onclick="exportExcel()">Exportar Excel</button>
+          <button onclick="window.print()">Exportar / Imprimir PDF</button>
+          <button onclick="exportPNG()">Exportar Imagem PNG</button>
+        </div>
+      </div>
+      <button class="btn icon" id="refreshBtn" title="Buscar a versão mais recente publicada">🔄 Atualizar</button>
+      <button class="btn icon" id="sidebarToggle" title="Ocultar/mostrar painel lateral">◀ Painel</button>
+      <button class="btn icon" id="themeBtn">🌙</button>
+      <button class="btn icon" id="logoutBtn" title="Sair">🔒 Sair</button>
+    </div>
+  </div>
+
+  <div class="body-wrap">
+    <div class="sidebar-reopen" id="sidebarReopen" title="Mostrar painel lateral">▶</div>
+    <div class="sidebar" id="sidebarEl">
+      <h4>Painel rápido</h4>
+      <div class="side-item"><span>📌 Cirurgias hoje</span><span class="n" id="sideToday">0</span></div>
+      <div class="side-item"><span>➡️ Amanhã</span><span class="n" id="sideTomorrow">0</span></div>
+      <div class="side-item"><span>⏱ Próximas 48h</span><span class="n" id="side48">0</span></div>
+      <div class="side-item"><span>❓ Sem confirmação</span><span class="n" id="sidePending">0</span></div>
+      <div class="side-item"><span>🚫 Cancel. recentes</span><span class="n" id="sideCancel">0</span></div>
+
+      <h4>Hoje (27/07)</h4>
+      <div class="side-list" id="listToday"></div>
+
+      <h4>Amanhã (28/07)</h4>
+      <div class="side-list" id="listTomorrow"></div>
+
+      <h4>Últimas alterações</h4>
+      <div class="side-list" id="listChanges"></div>
+
+      <h4>Equipe (siglas)</h4>
+      <div style="font-size:11px;color:var(--text-2);line-height:1.9;padding-left:2px;">
+        JP · JM · A · F · JK · L · W · Mayara · Fabi — siglas registradas no grupo (não identificadas por nome completo)
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="kpis" id="kpiRow"></div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="agenda">Agenda</div>
+        <div class="tab" data-tab="indicadores">Indicadores</div>
+        <div class="tab" data-tab="historico">Histórico</div>
+      </div>
+
+      <div id="tab-agenda">
+        <div class="panel">
+          <div class="filters">
+            <select id="fHospital"><option value="">Unidade (todas)</option></select>
+            <select id="fStaff"><option value="">Médico/Equipe (todos)</option></select>
+            <select id="fStatus"><option value="">Status (todos)</option></select>
+            <select id="fProc"><option value="">Procedimento (todos)</option></select>
+            <div class="view-toggle" id="viewToggle">
+              <button data-v="dia" class="">Dia</button>
+              <button data-v="semana" class="">Semana</button>
+              <button data-v="2semanas" class="active">2 Semanas</button>
+              <button data-v="mes">Mês</button>
+            </div>
+          </div>
+          <div id="agendaContainer"></div>
+        </div>
+      </div>
+
+      <div id="tab-indicadores" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Ocupação por semana (S1–S5) — capacidade de 3 cirurgias/dia</h3></div>
+          <div id="heatmap"></div>
+          <div class="badge-legend">
+            <span><span class="dot" style="background:var(--red)"></span>Vermelho — 0 cirurgias</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — 1 cirurgia</span>
+            <span><span class="dot" style="background:var(--blue)"></span>Azul — 2 cirurgias</span>
+            <span><span class="dot" style="background:var(--green)"></span>Verde — 3 cirurgias (lotado)</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Ocupação agosto — mês completo (S1–S5) — capacidade de 3 cirurgias/dia</h3></div>
+          <div id="heatmapAgosto"></div>
+          <div class="badge-legend">
+            <span><span class="dot" style="background:var(--red)"></span>Vermelho — 0 cirurgias</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — 1 cirurgia</span>
+            <span><span class="dot" style="background:var(--blue)"></span>Azul — 2 cirurgias</span>
+            <span><span class="dot" style="background:var(--green)"></span>Verde — 3 cirurgias (lotado)</span>
+          </div>
+          <div class="empty-note">Fonte: grupo de WhatsApp "AGENDA TC BOTAFOGO AGOSTO" · repostagem completa mais recente: 21/07 16:32 (Pré operatorio Capi Hair Plus) · Contagem calculada em tempo real a partir dos dados reais por paciente abaixo (não é mais uma contagem manual)</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Cirurgias de Agosto — dados reais do grupo (35 registros)</h3></div>
+          <table>
+            <thead><tr><th>Data</th><th>Paciente</th><th>Procedimento</th><th>Equipe</th><th>Valor</th><th>Status</th></tr></thead>
+            <tbody id="agostoListBody"></tbody>
+          </table>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-box"><h4>Cirurgias por dia (mês)</h4><canvas id="chartDia"></canvas></div>
+          <div class="chart-box"><h4>Cirurgias por médico/equipe</h4><canvas id="chartMedico"></canvas></div>
+          <div class="chart-box"><h4>Cirurgias por procedimento</h4><canvas id="chartProc"></canvas></div>
+          <div class="chart-box"><h4>Cirurgias por status</h4><canvas id="chartStatus"></canvas></div>
+          <div class="chart-box"><h4>Cirurgias por unidade/hospital</h4><canvas id="chartHospital"></canvas></div>
+          <div class="chart-box"><h4>Semanal vs diário (volume)</h4><canvas id="chartSemana"></canvas></div>
+        </div>
+      </div>
+
+      <div id="tab-historico" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Histórico de alterações do grupo</h3></div>
+          <table>
+            <thead><tr><th>Data/Hora</th><th>Autor</th><th>Tipo</th><th>Mensagem original</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Dados extraídos dos grupos de WhatsApp "AGENDA TC BOTAFOGO JULHO" (repostagem completa mais recente: 25/07/2026 10:13, AssucenaTomaz) e "AGENDA TC BOTAFOGO AGOSTO" (repostagem completa de 24/07/2026 11:42, João Pedro Closer Capi Hair) · A partir de 21/07/2026 toda atualização automática relê os dois grupos · Atualização automática programada (verificação a cada 2h, dias úteis) · Sem horário exato informado nas mensagens de origem · "Barra da Tijuca" na descrição indica apenas venda/fechamento pela unidade Barra — a cirurgia é realizada em Botafogo · Mensagem de 21/07 14:50 no grupo Agosto ("Antecipado paciente para dia 11/08") não identifica o paciente — reconfirmado às 16:32 e novamente em 24/07 que o dia 11/08 segue com 2 pacientes; nenhum registro foi alterado automaticamente, ver aba Histórico · Conversa de 21/07 15:28-15:30 no grupo Julho sobre antecipar pacientes para os dias 28/29 não identifica nome de paciente — nenhum registro adicional foi alterado; ver aba Histórico · Atualização de 22/07 15:10: paciente Alexandre Todeschine (24/07) cancelado (mãe hospitalizada em estado grave); paciente Ulimar Silva incluído no dia 29/07 · Atualização de 24/07 11:42-12:02: paciente Rodrigo Assumpção incluído no dia 20/08 (Agosto); Renan Marques Laterza (05/08) confirmado; Vinicius Alves da Silva remanejado do dia 28/07 para 30/07 (Julho) · Atualização de 24/07 13:14 – 25/07 10:13: Eucy Pinheiro (Confirmado) e Carlos Júnior incluídos no dia 30/07 (Julho) · Atualização de 27/07 10:25: confirmado manualmente que o paciente citado na mensagem de 26/07 16:00 ("Retirando paciente de segunda da agenda pois eletroforese não saiu") é Maicon Praxedes — Cancelado; dia 27/07 com 2 cirurgias (Jorge Henrique, Sandro Caldeira) · Atualização de 27/07 11:15: releitura criteriosa a pedido de Karina identificou paciente João Pedro incluído no dia 31/07 (repostagem de 26/07 16:00, sem legenda curta associada), que não havia sido capturado antes; dia 31/07 passa a ter 2 cirurgias · "Vagas em aberto" por dia agora calculadas dinamicamente (capacidade de 3/dia menos cirurgias ativas), substituindo valores fixos que ficavam desatualizados
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------------- AUTENTICAÇÃO (proteção simples por senha) ----------------
+(function(){
+  const AUTH_USER = "agenda";
+  const AUTH_PASS = "260820";
+  function setAuthed(v){
+    document.body.classList.toggle('authed', v);
+  }
+  if(localStorage.getItem('tc-auth')==='ok'){ setAuthed(true); }
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value;
+    if(u===AUTH_USER && p===AUTH_PASS){
+      localStorage.setItem('tc-auth','ok');
+      document.getElementById('loginError').style.display='none';
+      setAuthed(true);
+    } else {
+      document.getElementById('loginError').style.display='block';
+    }
+  });
+})();
+
+// ---------------- DATA ----------------
+const LAST_UPDATE = "2026-07-27 11:15 — Releitura criteriosa a pedido de Karina encontrou paciente João Pedro (13.900, 10x, F/A) incluído no dia 31/07, que não tinha sido capturado antes. Vagas em aberto agora calculadas dinamicamente. Também confirmado: cancelamento de Maicon Praxedes (27/07) e inclusões de Eucy Pinheiro e Carlos Júnior (30/07). Agosto — sem novidades desde 24/07 11:42.";
+const TODAY = "2026-07-27";
+
+const surgeries = [
+{id:1,date:"2026-07-01",patient:"Fabiano Fernandes Da Rocha",value:null,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Reparo sem custo e sem tratamento"},
+{id:2,date:"2026-07-01",patient:"Bruno Rosado Tristão Dias",value:11000,payment:"Pix",staff:["JP","JM"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:3,date:"2026-07-01",patient:"Marcio Alexandre",value:12000,payment:"Pix",staff:["JM","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:4,date:"2026-07-02",patient:"Thiago de Carvalho Daflon",value:13000,payment:"10x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:5,date:"2026-07-02",patient:"Arnaldo (Capi Hair)",value:null,payment:"",staff:[],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Procedimento interno da equipe"},
+{id:6,date:"2026-07-03",patient:"Leonardo Félix",value:21000,payment:"18x",staff:["W","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:7,date:"2026-07-03",patient:"Leonardo Pereira de Souza",value:13900,payment:"10x",staff:["JP","JM"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:8,date:"2026-07-03",patient:"João Marcos Warol",value:21000,payment:"Pix",staff:["JP","Mayara"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:9,date:"2026-07-04",patient:"Alan Lucelio",value:13000,payment:"12x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:10,date:"2026-07-04",patient:"Luiz Henrique",value:22000,payment:"à vista",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:11,date:"2026-07-06",patient:"Claudio Moreira",value:12000,payment:"12x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:12,date:"2026-07-06",patient:"Sérgio Augusto",value:13900,payment:"10x",staff:["JK","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:13,date:"2026-07-06",patient:"Nelson Michael Alves",value:16500,payment:"10x",staff:["JP","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:14,date:"2026-07-07",patient:"Leandro Pires de Souza",value:13100,payment:"12x",staff:["JP","F"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:15,date:"2026-07-07",patient:"Breno Magno dos Santos",value:13000,payment:"12x",staff:["A","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:16,date:"2026-07-10",patient:"Geraldo Luiz Da Canto Almeida",value:13900,payment:"Pix",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:17,date:"2026-07-10",patient:"Bruno Nazareth de Lana",value:13900,payment:"12x",staff:["A","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:18,date:"2026-07-10",patient:"Paloma Moreira",value:23000,payment:"Pix",staff:["JK","A"],procedure:"Sobrancelha",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:19,date:"2026-07-11",patient:"Rogério da Rocha Gouveia",value:13000,payment:"10x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:20,date:"2026-07-11",patient:"Arthur Lopes",value:13000,payment:"à vista",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:21,date:"2026-07-11",patient:"Maria Rosa",value:3000,payment:"à vista",staff:["A"],procedure:"Sobrancelha",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:22,date:"2026-07-13",patient:"Alexandre Robert Xavier",value:12000,payment:"Pix",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:23,date:"2026-07-15",patient:"Vitor Faustino",value:25000,payment:"à vista",staff:["A"],procedure:"Extração de Barba",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:24,date:"2026-07-17",patient:"Claudio Jorge de Faria Antunes",value:null,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Reparo sem custo"},
+{id:25,date:"2026-07-17",patient:"João Camacho",value:11800,payment:"",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:26,date:"2026-07-18",patient:"João Pergentino do Carmo",value:11000,payment:"à vista",staff:["A","Mayara"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:27,date:"2026-07-18",patient:"Hytalo Kildaree",value:13000,payment:"12x",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:28,date:"2026-07-18",patient:"Irvani Cordeiro",value:21500,payment:"12x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:29,date:"2026-07-20",patient:"Rubens Donell",value:12100,payment:"à vista",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:30,date:"2026-07-20",patient:"Jose Marcos de Souza",value:13500,payment:"Pix",staff:["JP","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:31,date:"2026-07-20",patient:"Felipe Francis de Brito",value:13900,payment:"",staff:["Fabi","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Venda/fechamento pela unidade Barra da Tijuca; cirurgia realizada em Botafogo"},
+{id:32,date:"2026-07-21",patient:"Everton Silva de Oliveira",value:13000,payment:"10x",staff:["A","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:33,date:"2026-07-21",patient:"Elizeu Goeth",value:13900,payment:"",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:34,date:"2026-07-21",patient:"Alan Santiago",value:14500,payment:"Pix",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:35,date:"2026-07-22",patient:"João Ulisses Strauss",value:13200,payment:"12x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:36,date:"2026-07-22",patient:"Adilson Fernandes",value:13100,payment:"",staff:["JK","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:37,date:"2026-07-22",patient:"Allan Soares",value:11100,payment:"10x",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:38,date:"2026-07-23",patient:"Erivan Oliveira",value:14900,payment:"",staff:["JP","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 20/07 — mensagem: 'Incluindo dia 23 com 1'"},
+{id:39,date:"2026-07-24",patient:"Alexandre Todeschine",value:14000,payment:"12x",staff:["F","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Cancelado",obs:"Retirado do dia 24 — mensagem de 22/07 14:02 ('Retirado paciente do dia 24'); motivo informado (mensagem editada 14:06): 'A mãe passou mal está doente no hospital estado grave'"},
+{id:40,date:"2026-07-23",patient:"Rafael Eletherio",value:14500,payment:"Pix",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Reagendado",obs:"Antecipado de sexta (24/07) para quinta (23/07) — mensagem de 20/07 11:01"},
+{id:41,date:"2026-07-25",patient:"Gabriel Caldas",value:18900,payment:"Cartão",staff:[],procedure:"Sobrancelha",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:42,date:"2026-07-25",patient:"Leon Bowe",value:13900,payment:"10x",staff:["JP","W"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:43,date:"2026-07-25",patient:"Ricardo Valansi",value:14000,payment:"8x",staff:["JP","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:44,date:"2026-07-27",patient:"Jorge Henrique",value:12000,payment:"à vista",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:45,date:"2026-07-27",patient:"Sandro Caldeira",value:12000,payment:"",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:46,date:"2026-07-27",patient:"Maicon Praxedes",value:13100,payment:"Pix",staff:["JP","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Cancelado",obs:"Retirado do dia 27/07 — mensagem de 26/07 16:00 ('Retirando paciente de segunda da agenda pois eletroforese não saiu'); paciente confirmado manualmente por Karina em 27/07."},
+{id:47,date:"2026-07-30",patient:"Vinicius Alves da Silva",value:13500,payment:"crédito à vista",staff:["JP","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Reagendado",obs:"Remanejado do dia 28/07 para o dia 30/07 — mensagem de 24/07 12:02 ('Paciente do dia 28 passado para dia 30')"},
+{id:55,date:"2026-07-30",patient:"Eucy Pinheiro",value:25000,payment:"5x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original. Incluído em 24/07 13:14 — mensagem: 'Dia 30 com 2'"},
+{id:56,date:"2026-07-30",patient:"Carlos Júnior",value:13500,payment:"à vista",staff:["JK","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 25/07 10:13 — mensagem: 'Incluindo dia 30 com 3'"},
+{id:48,date:"2026-07-28",patient:"José Aurélio Silva",value:22000,payment:"12x",staff:["JP","JM"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:49,date:"2026-07-28",patient:"Luiz Nunes Poyes",value:5000,payment:"5x",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:53,date:"2026-07-28",patient:"Daniel Moreira",value:14000,payment:"12x",staff:["JM","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 15:24 — mensagem: 'Incluindo dia 28'"},
+{id:50,date:"2026-07-29",patient:"Michel Costa",value:null,payment:"",staff:[],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Indicação Conecta Business"},
+{id:51,date:"2026-07-29",patient:"Alaildo Conceição Silva",value:10000,payment:"",staff:["Fabi"],procedure:"2º Transplante",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Venda/fechamento pela unidade Barra da Tijuca; cirurgia realizada em Botafogo. Marcado com ✅ na mensagem original"},
+{id:52,date:"2026-07-31",patient:"Eduardo de Souza",value:11000,payment:"Pix",staff:["JK","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:57,date:"2026-07-31",patient:"João Pedro",value:13900,payment:"10x",staff:["F","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Paciente (nome coincide com o de João Pedro Closer Capi Hair, que posta as atualizações do grupo — são pessoas diferentes). Identificado na repostagem completa de 26/07 16:00 (João Pedro Closer Capi Hair), sem mensagem curta de aviso separada; passa de 1 para 2 cirurgias no dia 31/07."},
+{id:54,date:"2026-07-29",patient:"Ulimar Silva",value:15500,payment:"",staff:["JP","F"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 22/07 12:39 — mensagem: 'Dia 29 com 3'"}
+];
+
+// Cirurgias de agosto/2026 — extraídas do grupo de WhatsApp "AGENDA TC BOTAFOGO AGOSTO" (repostagem completa mais recente: 21/07 14:46, AssucenaTomaz, editada)
+const surgeriesAgosto = [
+{id:1001,date:"2026-08-01",patient:"João Philippe",value:12000,payment:"12x",staff:["JP","W"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1002,date:"2026-08-01",patient:"Edmilson Leandro Gomes",value:13200,payment:"6x",staff:["A","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1003,date:"2026-08-01",patient:"Armandson Santana da Paz",value:15900,payment:"12x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1004,date:"2026-08-03",patient:"Pedro Schmdt Bentes",value:6000,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1005,date:"2026-08-03",patient:"Rodrigo Machado Pinto",value:22000,payment:"10x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:1006,date:"2026-08-03",patient:"Victor Fingolo",value:13200,payment:"12x",staff:["JP","JM"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1007,date:"2026-08-04",patient:"Jorge Henrique Gonçalves",value:11000,payment:"12x",staff:["JP","W"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1008,date:"2026-08-04",patient:"Maicon Gonçalves",value:18900,payment:"12x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1009,date:"2026-08-04",patient:"Pedro Paulo",value:13900,payment:"",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1010,date:"2026-08-05",patient:"Renan Marques Laterza",value:18900,payment:"5x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:1011,date:"2026-08-06",patient:"Paulo Cesar Silva",value:12200,payment:"PIX",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1012,date:"2026-08-07",patient:"Victor Elias Titonelli",value:11000,payment:"10x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1013,date:"2026-08-08",patient:"Augusto Jorge Da Eira Jr",value:13000,payment:"12x",staff:["A","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 20/07 14:07 — mensagem: 'Incluindo dia 08 com 02'"},
+{id:1014,date:"2026-08-08",patient:"Cristiano Alves Ribeiro",value:13500,payment:"PIX",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original. Incluído em 20/07 14:07 — mensagem: 'Incluindo dia 08 com 02'"},
+{id:1015,date:"2026-08-10",patient:"Pedro Lucas Silva",value:null,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1016,date:"2026-08-10",patient:"Carlos Alberto Oliveira Jr",value:13100,payment:"",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1017,date:"2026-08-11",patient:"Antonio Felipe Bittencout",value:12000,payment:"à vista",staff:["JP","F"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1018,date:"2026-08-11",patient:"Túlio de Souza Silva",value:12100,payment:"12x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1019,date:"2026-08-12",patient:"Jose Edison Esteves Jr",value:18900,payment:"8x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original. Incluído em 21/07 13:23 — mensagem: 'Incluindo dia 12'"},
+{id:1020,date:"2026-08-14",patient:"Filipe Class Pessanha",value:23000,payment:"PIX",staff:["JP","W"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1021,date:"2026-08-15",patient:"Filipe Santanna Bercot",value:12500,payment:"12x",staff:["JP","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1022,date:"2026-08-17",patient:"Francisco Ricardo de Castro",value:14000,payment:"12x",staff:["A","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1023,date:"2026-08-19",patient:"Diego Mangia",value:null,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Reparo sem custo"},
+{id:1024,date:"2026-08-20",patient:"Aziz Khazzah Warrak",value:15000,payment:"à vista",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1025,date:"2026-08-20",patient:"Rodrigo Araujo Gomes",value:13900,payment:"10x",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original"},
+{id:1026,date:"2026-08-22",patient:"Jaime Maciel",value:22000,payment:"",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 11:47 — mensagem: 'Incluindo dia 22'"},
+{id:1027,date:"2026-08-24",patient:"Felipe Cimino",value:null,payment:"",staff:[],procedure:"Reparo",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Reparo sem custo"},
+{id:1028,date:"2026-08-25",patient:"Guilherme Cavalcanti Marinho",value:13100,payment:"",staff:["JP","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1029,date:"2026-08-25",patient:"Áthila Enzo Mendonça",value:13000,payment:"à vista",staff:["A","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:""},
+{id:1030,date:"2026-08-29",patient:"Thiago Benedito Borges",value:13500,payment:"PIX",staff:["L","L"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 14:46 — mensagem: 'Incluindo dia 29'"},
+{id:1031,date:"2026-08-29",patient:"Heliomar Moura Macedo",value:14500,payment:"8x",staff:["JP","JK"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 14:46 — mensagem: 'Incluindo dia 29'"},
+{id:1032,date:"2026-08-29",patient:"João Gustavo Taveira",value:13000,payment:"12x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Confirmado",obs:"Marcado com ✅ na mensagem original. Incluído em 21/07 14:46 — mensagem: 'Incluindo dia 29'"},
+{id:1033,date:"2026-08-29",patient:"Francis Nunes",value:12500,payment:"",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 14:46 — mensagem: 'Incluindo dia 29'"},
+{id:1034,date:"2026-08-10",patient:"Eduardo de Paula Silva",value:13900,payment:"10x",staff:["A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 21/07 16:32 — mensagem: 'Incluindo dia 10 com 03'"},
+{id:1035,date:"2026-08-20",patient:"Rodrigo Assumpção",value:14000,payment:"",staff:["JP"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 24/07 11:42 — mensagem: 'Dia 20 com 3'"}
+];
+
+const history = [
+{ts:"19/07 15:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@AssucenaTomaz @João Pedro Closer Capi Hair e @Fabi Mazzoleni até segunda eu conto com vcs pra preencher: 24/24 e 29"},
+{ts:"19/07 16:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@Fabi Mazzoleni joga alguns pra cá pra ajudar."},
+{ts:"20/07 10:06",author:"Fabi Mazzoleni",type:"Confirmação",msg:"Dia 29 ok"},
+{ts:"20/07 10:14",author:"AssucenaTomaz",type:"Inclusão de paciente",msg:"Incluindo dia 23 com 1 — paciente Erivan Oliveira adicionado à agenda do dia 23/07"},
+{ts:"20/07 11:01",author:"João Pedro Closer Capi Hair",type:"Reagendamento",msg:"Antecipado paciente de sexta para quinta — identificado como Rafael Eletherio, movido de 24/07 (sexta) para 23/07 (quinta)"},
+{ts:"21/07 11:52",author:"Sistema (verificação automática)",type:"Confirmação (reconciliação)",msg:"Releitura da mensagem completa de 20/07 11:01 (João Pedro Closer Capi Hair) identificou marcações ✅ não refletidas anteriormente no dashboard. Status alterado para Confirmado: Thiago de Carvalho Daflon (02/07), Nelson Michael Alves (06/07), João Pergentino do Carmo (18/07), Jose Marcos de Souza (20/07), Everton Silva de Oliveira (21/07), João Ulisses Strauss (22/07) e Alaildo Conceição Silva (29/07). Nenhuma mensagem nova além das já registradas."},
+{ts:"20/07 14:07",author:"Pré operatorio Capi Hair Plus",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 08 com 02 — pacientes Augusto Jorge Da Eira Jr e Cristiano Alves Ribeiro adicionados à agenda do dia 08/08"},
+{ts:"21/07 11:47",author:"AssucenaTomaz",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 22 — paciente Jaime Maciel adicionado à agenda do dia 22/08"},
+{ts:"21/07 13:23",author:"Pré operatorio Capi Hair Plus",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 12 — paciente Jose Edison Esteves Jr adicionado à agenda do dia 12/08"},
+{ts:"21/07 14:46",author:"AssucenaTomaz",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 29 (mensagem editada) — pacientes Thiago Benedito Borges, Heliomar Moura Macedo, João Gustavo Taveira e Francis Nunes na agenda do dia 29/08"},
+{ts:"21/07 14:50",author:"AssucenaTomaz",type:"Reagendamento (Agosto) — pendente de confirmação",msg:"Antecipado paciente para dia 11/08 — mensagem não identifica o nome do paciente nem a data de origem; nenhum registro foi alterado automaticamente. Verificar manualmente com a equipe qual paciente foi antecipado para 11/08."},
+{ts:"21/07 14:50",author:"Sistema (verificação automática)",type:"Setup — dados reais Agosto",msg:"Primeira leitura completa do grupo 'AGENDA TC BOTAFOGO AGOSTO' com extração de dados reais por paciente (33 cirurgias, mensagem de 21/07 14:46 da AssucenaTomaz, editada). Heatmap de agosto passa a ser calculado a partir de surgeriesAgosto (dados reais), substituindo a contagem manual augustCounts usada anteriormente. A partir desta atualização, toda execução automática relê os dois grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO'."},
+{ts:"21/07 15:24",author:"AssucenaTomaz",type:"Inclusão de paciente (Julho)",msg:"Incluindo dia 28 — repostagem completa do grupo confirma novo paciente Daniel Moreira adicionado à agenda do dia 28/07 (14k em 12x, equipe JM/A), passando de 3 para 4 cirurgias no dia."},
+{ts:"21/07 15:28–15:30",author:"Lindomar Capi Hair / AssucenaTomaz",type:"Coordenação — pendente de identificação (Julho)",msg:"Troca de mensagens sobre preencher vagas dos dias 28 e 29 ('23…..24……' / '29……30…….' / 'Tem 4 dia 28 e 4 29' / 'Vamos antecipar para essas datas' / 'Então antecipa' / 'Faz logo' / 'Estou aguardando' / 'Vai esquecer' / 'Já aconteceu !!!!'). Nenhum nome de paciente foi identificado na conversa, portanto nenhum registro foi alterado automaticamente além da inclusão de Daniel Moreira já registrada acima. Verificar manualmente com a equipe o que foi antecipado."},
+{ts:"21/07 16:03",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Agosto)",msg:"Grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado — última mensagem continua sendo a de 21/07 14:50 (AssucenaTomaz, 'Antecipado paciente para dia 11/08'), já registrada anteriormente. Nenhuma mensagem nova."},
+{ts:"21/07 16:32",author:"Pré operatorio Capi Hair Plus",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 10 com 03 — repostagem completa do grupo confirma novo paciente Eduardo de Paula Silva adicionado à agenda do dia 10/08 (13.900 em 10x, equipe A), passando de 2 para 3 cirurgias no dia. Repostagem também reconfirma que o dia 11/08 segue com apenas 2 pacientes (Antonio Felipe Bittencout e Túlio de Souza Silva) — o paciente citado em 'Antecipado paciente para dia 11/08' (21/07 14:50) segue não identificado."},
+{ts:"21/07 18:02",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho)",msg:"Grupo 'AGENDA TC BOTAFOGO JULHO' reverificado — última mensagem continua sendo a de 21/07 15:30 (Lindomar Capi Hair, 'Já aconteceu !!!!'), já registrada anteriormente. Nenhuma mensagem nova."},
+{ts:"22/07 09:12",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 21/07 15:30, Lindomar Capi Hair, 'Já aconteceu !!!!') e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"22/07 14:04",author:"Sistema (verificação automática)",type:"Falha técnica — verificação não concluída",msg:"Extensão Claude in Chrome não conectada/indisponível nesta execução. Não foi possível acessar o WhatsApp Web para reler os grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO'. Nenhum dado foi alterado; agenda permanece com a última leitura bem-sucedida. Recomenda-se nova tentativa na próxima execução programada."},
+{ts:"22/07 14:02",author:"AssucenaTomaz",type:"Cancelamento (Julho)",msg:"Retirado paciente do dia 24 — único paciente agendado nesse dia era Alexandre Todeschine, marcado como Cancelado. Motivo informado em mensagem editada às 14:06: 'A mãe passou mal está doente no hospital estado grave'."},
+{ts:"22/07 12:39",author:"João Pedro Closer Capi Hair / AssucenaTomaz",type:"Inclusão de paciente (Julho)",msg:"Dia 29 com 3 — repostagem completa do grupo (14:02, AssucenaTomaz) confirma novo paciente Ulimar Silva 15.500 (JP)(F) adicionado à agenda do dia 29/07, passando de 2 para 3 cirurgias no dia."},
+{ts:"22/07 15:10",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome reconectada. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso (cancelamento dia 24 + inclusão dia 29 aplicados acima). Grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado — última mensagem continua sendo a de 21/07 16:32, sem novidades."},
+{ts:"23/07",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"23/07 10:02",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"23/07 16:06",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"23/07 18:02",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"24/07 09:22",author:"Sistema (verificação automática)",type:"Falha técnica — verificação não concluída",msg:"Extensão Claude in Chrome não conectada/indisponível nesta execução. Não foi possível acessar o WhatsApp Web para reler os grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO', nem publicar a atualização no Netlify. Nenhum dado de cirurgia foi alterado; agenda permanece com a última leitura bem-sucedida (Julho 22/07 14:06, Agosto 21/07 16:32). Recomenda-se nova tentativa na próxima execução programada."},
+{ts:"24/07 09:26",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Extensão Claude in Chrome reconectada. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"24/07 10:02",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 22/07 14:06, AssucenaTomaz, editada, sobre o cancelamento do dia 24) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 21/07 16:32, Pré operatorio Capi Hair Plus, 'Incluindo dia 10 com 03'). Nenhuma mensagem nova em nenhum dos dois grupos."},
+{ts:"24/07 11:42",author:"João Pedro Closer Capi Hair",type:"Inclusão de paciente (Agosto)",msg:"Dia 20 com 3 — repostagem completa do grupo Agosto confirma novo paciente Rodrigo Assumpção 14k (JP) adicionado à agenda do dia 20/08, passando de 2 para 3 cirurgias no dia."},
+{ts:"24/07 11:42",author:"Sistema (verificação automática)",type:"Confirmação (reconciliação — Agosto)",msg:"Repostagem completa do grupo Agosto (11:42) identificou marcação ✅ não refletida anteriormente no dashboard. Status alterado para Confirmado: Renan Marques Laterza (05/08)."},
+{ts:"24/07 12:02",author:"João Pedro Closer Capi Hair",type:"Reagendamento (Julho)",msg:"Paciente do dia 28 passado para dia 30 — repostagem completa do grupo Julho (12:02) confirma que o paciente remanejado é Vinicius Alves da Silva (13.500, crédito à vista, JP/L), movido de 28/07 para 30/07."},
+{ts:"24/07 13:14",author:"João Pedro Closer Capi Hair",type:"Inclusão de paciente (Julho)",msg:"Dia 30 com 2 — repostagem completa do grupo Julho confirma novo paciente Eucy Pinheiro 25k em 5x (JP), marcado com ✅ (Confirmado), adicionado à agenda do dia 30/07, passando de 1 para 2 cirurgias no dia."},
+{ts:"25/07 10:13",author:"AssucenaTomaz",type:"Inclusão de paciente (Julho)",msg:"Incluindo dia 30 com 3 — repostagem completa do grupo Julho confirma novo paciente Carlos Júnior 13.500 à vista (JK/A) adicionado à agenda do dia 30/07, passando de 2 para 3 cirurgias no dia. Repostagem também reconfirma o dia 31/07 com 1 paciente (Eduardo de Souza), já registrado anteriormente."},
+{ts:"25/07 11:08–11:09",author:"AssucenaTomaz",type:"Verificação sem novidades (Julho)",msg:"Incluindo dia 31 — repostagem confirma que o dia 31/07 segue com apenas Eduardo de Souza (já registrado); nenhum paciente novo identificado além do já existente."},
+{ts:"26/07 16:00",author:"João Pedro Closer Capi Hair",type:"Inclusão de paciente (Julho)",msg:"Repostagem completa do grupo Julho (16:00) — sem mensagem curta de aviso separada — revela novo paciente João Pedro 13.900 em 10x (F/A) adicionado à agenda do dia 31/07, passando de 1 para 2 cirurgias no dia. Esta inclusão só foi identificada em 27/07 numa releitura mais criteriosa das mensagens; não havia sido capturada anteriormente porque não veio acompanhada de legenda curta (tipo 'Incluindo dia...')."},
+{ts:"26/07 16:00",author:"João Pedro Closer Capi Hair",type:"Cancelamento (Julho) — pendente de identificação",msg:"Retirando paciente de segunda da agenda pois eletroforese não saiu — mensagem não identifica o nome do paciente. O dia 27/07 (segunda) segue com os 3 pacientes atualmente cadastrados (Jorge Henrique, Sandro Caldeira, Maicon Praxedes); nenhum registro foi removido automaticamente. Verificar manualmente com a equipe qual paciente deve ser retirado do dia 27/07."},
+{ts:"27/07 10:25",author:"Karina (confirmação manual)",type:"Cancelamento (Julho) — pendência resolvida",msg:"Confirmado que o paciente retirado da agenda do dia 27/07 (mensagem de 26/07 16:00, 'eletroforese não saiu') é Maicon Praxedes. Status alterado para Cancelado. Dia 27/07 passa de 3 para 2 cirurgias (Jorge Henrique e Sandro Caldeira)."},
+{ts:"27/07 09:40",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome reconectada. Grupos 'AGENDA TC BOTAFOGO JULHO' e 'AGENDA TC BOTAFOGO AGOSTO' relidos com sucesso. Julho: inclusão de Eucy Pinheiro e Carlos Júnior (30/07) aplicadas acima; pendência de cancelamento não identificado no dia 27/07 registrada acima. Agosto: última mensagem continua sendo a de 24/07 11:42 (João Pedro Closer Capi Hair, 'Dia 20 com 3'), sem novidades."},
+{ts:"27/07 11:15",author:"Sistema (releitura criteriosa solicitada por Karina)",type:"Correção — inclusão retroativa (Julho)",msg:"A pedido de Karina, releitura completa e criteriosa de todas as mensagens do grupo Julho desde 24/07 (sexta-feira) até o momento. Encontrada a inclusão de João Pedro no dia 31/07 (ver acima), que não tinha sido capturada nas verificações anteriores por não ter mensagem curta de aviso associada. Também corrigido o mapa de 'vagas em aberto', que era um valor fixo desatualizado — passou a ser calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas)."}
+];
+
+// Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
+function computeOpenSlots(){
+  const counts = {};
+  surgeries.forEach(s=>{ if(s.status!=="Cancelado"){ counts[s.date]=(counts[s.date]||0)+1; } });
+  const slots = {};
+  Object.keys(counts).forEach(d=>{ const open = 3-counts[d]; if(open>0) slots[d]=open; });
+  return slots;
+}
+const openSlots = computeOpenSlots();
+
+// Contagem de cirurgias por dia — agosto/2026, mês completo (S1–S5), calculada em tempo real a partir de surgeriesAgosto (dados reais por paciente extraídos do grupo "AGENDA TC BOTAFOGO AGOSTO")
+function computeAugustCounts(){
+  const counts = {};
+  surgeriesAgosto.forEach(s=>{ counts[s.date] = (counts[s.date]||0) + 1; });
+  return counts;
+}
+
+// ---------------- HELPERS ----------------
+const statusClass = s => ({"Agendado":"agendado","Confirmado":"confirmado","Reagendado":"reagendado","Cancelado":"cancelado","Alta Prioridade":"prioridade"}[s]||"agendado");
+const statusColor = s => ({"Agendado":"#3b82f6","Confirmado":"#22c55e","Reagendado":"#eab308","Cancelado":"#ef4444","Alta Prioridade":"#a855f7"}[s]||"#3b82f6");
+const fmtMoney = v => v==null? "—" : "R$ " + v.toLocaleString("pt-BR");
+const weekdayName = dstr => new Date(dstr+"T12:00:00").toLocaleDateString('pt-BR',{weekday:'long'});
+const fmtDate = dstr => { const d=new Date(dstr+"T12:00:00"); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); };
+const daysBetween = (a,b) => Math.round((new Date(b)-new Date(a))/86400000);
+
+let state = { view:"2semanas", hospital:"", staff:"", status:"", proc:"", search:"" };
+
+// ---------------- POPULATE FILTER OPTIONS ----------------
+function uniq(arr){return [...new Set(arr)];}
+function fillSelect(id, values){
+  const sel = document.getElementById(id);
+  values.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+}
+fillSelect('fHospital', uniq(surgeries.map(s=>s.hospital)));
+fillSelect('fStaff', uniq(surgeries.flatMap(s=>s.staff)).sort());
+fillSelect('fStatus', ["Agendado","Confirmado","Reagendado","Cancelado","Alta Prioridade"]);
+fillSelect('fProc', uniq(surgeries.map(s=>s.procedure)));
+
+// ---------------- KPI ----------------
+function renderKPIs(){
+  const total = surgeries.length;
+  // Janelas dinâmicas relativas a TODAY (7 dias corridos): semana atual = hoje..+6, próxima semana = +7..+13
+  const addDaysStr = (dstr,n) => { const d=new Date(dstr+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+  const weekStart = TODAY, weekEndDyn = addDaysStr(TODAY,6);
+  const nextWeekStart = addDaysStr(TODAY,7), nextWeekEnd = addDaysStr(TODAY,13);
+  const weekCount = surgeries.filter(s=>s.date>=weekStart&&s.date<=weekEndDyn&&s.status!=="Cancelado").length;
+  const nextWeekCount = surgeries.filter(s=>s.date>=nextWeekStart&&s.date<=nextWeekEnd&&s.status!=="Cancelado").length;
+  const cancel = surgeries.filter(s=>s.status==="Cancelado").length;
+  const resched = surgeries.filter(s=>s.status==="Reagendado").length;
+  const confirmed = surgeries.filter(s=>s.status==="Confirmado").length;
+  const pending = surgeries.filter(s=>s.status==="Agendado").length;
+  const kpis = [
+    {v:total,l:"Total de Cirurgias",c:"ink"},
+    {v:weekCount,l:"Cirurgias da Semana",c:"blue"},
+    {v:nextWeekCount,l:"Próxima Semana",c:"blue"},
+    {v:cancel,l:"Cancelamentos",c:"red"},
+    {v:resched,l:"Reagendamentos",c:"yellow"},
+    {v:confirmed,l:"Confirmações",c:"green"},
+    {v:pending,l:"Pacientes Pendentes",c:"purple"}
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`<div class="kpi c-${k.c}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+}
+
+// ---------------- SIDEBAR ----------------
+function renderSidebar(){
+  const tomorrowStr = (()=>{ const d=new Date(TODAY+"T12:00:00"); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); })();
+  const today = surgeries.filter(s=>s.date===TODAY && s.status!=="Cancelado");
+  const tomorrow = surgeries.filter(s=>s.date===tomorrowStr && s.status!=="Cancelado");
+  const in48 = surgeries.filter(s=>daysBetween(TODAY,s.date)>=0 && daysBetween(TODAY,s.date)<=2 && s.status!=="Cancelado");
+  const pending = surgeries.filter(s=>s.status==="Agendado");
+  const cancelled = surgeries.filter(s=>s.status==="Cancelado");
+
+  document.getElementById('sideToday').textContent = today.length;
+  document.getElementById('sideTomorrow').textContent = tomorrow.length;
+  document.getElementById('side48').textContent = in48.length;
+  document.getElementById('sidePending').textContent = pending.length;
+  document.getElementById('sideCancel').textContent = cancelled.length;
+
+  const renderList = (list) => list.length ? list.map(s=>`<div class="side-patient"><div class="p-name">${s.patient}</div><div class="p-meta">${s.procedure} · ${s.staff.join(', ')||'—'}</div></div>`).join('') : '<div class="empty-note">Nenhum registro</div>';
+  document.getElementById('listToday').innerHTML = renderList(today);
+  document.getElementById('listTomorrow').innerHTML = renderList(tomorrow);
+  document.getElementById('listChanges').innerHTML = history.slice(-3).reverse().map(h=>`<div class="side-patient"><div class="p-name">${h.type}</div><div class="p-meta">${h.ts} · ${h.msg.slice(0,50)}...</div></div>`).join('');
+}
+
+// ---------------- AGENDA ----------------
+function viewRange(){
+  const today = new Date(TODAY+"T12:00:00");
+  let start, end;
+  if(state.view==="dia"){ start=new Date(today); end=new Date(today); }
+  else if(state.view==="semana"){ start=new Date(today); end=new Date(today); end.setDate(end.getDate()+6); }
+  else if(state.view==="2semanas"){ start=new Date(today); end=new Date(today); end.setDate(end.getDate()+13); }
+  else { start=new Date(2026,6,1); end=new Date(2026,6,31); }
+  const iso = d => d.toISOString().slice(0,10);
+  return [iso(start), iso(end)];
+}
+
+function filteredSurgeries(){
+  const [start,end] = viewRange();
+  return surgeries.filter(s=>{
+    if(s.date<start||s.date>end) return false;
+    if(state.hospital && s.hospital!==state.hospital) return false;
+    if(state.staff && !s.staff.includes(state.staff)) return false;
+    if(state.status && s.status!==state.status) return false;
+    if(state.proc && s.procedure!==state.proc) return false;
+    if(state.search){
+      const q = state.search.toLowerCase();
+      const hay = `${s.patient} ${s.staff.join(' ')} ${s.hospital} ${s.procedure} ${s.date}`.toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderAgenda(){
+  const list = filteredSurgeries();
+  const byDay = {};
+  list.forEach(s=>{ (byDay[s.date]=byDay[s.date]||[]).push(s); });
+  const dates = Object.keys(byDay).sort();
+  const cont = document.getElementById('agendaContainer');
+  if(!dates.length){ cont.innerHTML = '<div class="empty-note">Nenhuma cirurgia encontrada para os filtros/período selecionados.</div>'; return; }
+  cont.innerHTML = dates.map(d=>{
+    const isToday = d===TODAY;
+    const cards = byDay[d].map(s=>`
+      <div class="card st-${statusClass(s.status)}">
+        <div class="name">${s.patient}</div>
+        <div class="row2">
+          ${s.procedure}<br>
+          ${s.hospital}<br>
+          Equipe: ${s.staff.join(', ')||'—'}<br>
+          ${fmtMoney(s.value)} ${s.payment?('· '+s.payment):''}
+          ${s.obs?('<br><em>'+s.obs+'</em>'):''}
+        </div>
+        <span class="chip st-${statusClass(s.status)}">${s.status}</span>
+      </div>`).join('');
+    const openCount = openSlots[d] ? `<span style="color:var(--text-2);font-weight:500;text-transform:none;"> · ${openSlots[d]} vaga(s) em aberto</span>` : '';
+    return `<div class="day-group">
+      <div class="day-title">${weekdayName(d)}, ${fmtDate(d)} ${isToday?'<span class="today-flag">HOJE</span>':''}${openCount}</div>
+      <div class="cards-row">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---------------- HISTORY TAB ----------------
+function renderHistory(){
+  document.getElementById('historyBody').innerHTML = history.map(h=>`<tr><td>${h.ts}</td><td>${h.author}</td><td>${h.type}</td><td>${h.msg}</td></tr>`).join('');
+}
+
+// ---------------- CHARTS ----------------
+let chartRefs = {};
+function destroyCharts(){ Object.values(chartRefs).forEach(c=>c && c.destroy()); }
+function baseOpts(isPie){
+  const gridColor = getComputedStyle(document.body).getPropertyValue('--border');
+  const textColor = getComputedStyle(document.body).getPropertyValue('--text-2');
+  return { responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:textColor,boxWidth:10,font:{size:10.5}}}},
+    scales: isPie?{}:{ x:{ticks:{color:textColor,font:{size:10}},grid:{color:gridColor}}, y:{ticks:{color:textColor,font:{size:10}},grid:{color:gridColor},beginAtZero:true} } };
+}
+function renderCharts(){
+  destroyCharts();
+  const palette = ['#4f46e5','#22c55e','#eab308','#ef4444','#a855f7','#3b82f6','#f97316','#14b8a6','#ec4899'];
+
+  // por dia
+  const byDate = {};
+  surgeries.forEach(s=>{ if(s.status!=="Cancelado"){ byDate[s.date]=(byDate[s.date]||0)+1; } });
+  const dateKeys = Object.keys(byDate).sort();
+  chartRefs.dia = new Chart(document.getElementById('chartDia'), {type:'bar',
+    data:{labels:dateKeys.map(fmtDate),datasets:[{label:'Cirurgias',data:dateKeys.map(k=>byDate[k]),backgroundColor:'#4f46e5',borderRadius:4}]},
+    options:baseOpts(false)});
+
+  // por médico
+  const byStaff = {};
+  surgeries.forEach(s=>s.staff.forEach(st=>{byStaff[st]=(byStaff[st]||0)+1;}));
+  chartRefs.medico = new Chart(document.getElementById('chartMedico'), {type:'bar',
+    data:{labels:Object.keys(byStaff),datasets:[{label:'Cirurgias',data:Object.values(byStaff),backgroundColor:'#22c55e',borderRadius:4}]},
+    options:baseOpts(false)});
+
+  // por procedimento
+  const byProc = {};
+  surgeries.forEach(s=>{byProc[s.procedure]=(byProc[s.procedure]||0)+1;});
+  chartRefs.proc = new Chart(document.getElementById('chartProc'), {type:'doughnut',
+    data:{labels:Object.keys(byProc),datasets:[{data:Object.values(byProc),backgroundColor:palette}]},
+    options:baseOpts(true)});
+
+  // por status
+  const byStatus = {};
+  surgeries.forEach(s=>{byStatus[s.status]=(byStatus[s.status]||0)+1;});
+  chartRefs.status = new Chart(document.getElementById('chartStatus'), {type:'doughnut',
+    data:{labels:Object.keys(byStatus),datasets:[{data:Object.values(byStatus),backgroundColor:Object.keys(byStatus).map(statusColor)}]},
+    options:baseOpts(true)});
+
+  // por hospital
+  const byHosp = {};
+  surgeries.forEach(s=>{byHosp[s.hospital]=(byHosp[s.hospital]||0)+1;});
+  chartRefs.hosp = new Chart(document.getElementById('chartHospital'), {type:'pie',
+    data:{labels:Object.keys(byHosp),datasets:[{data:Object.values(byHosp),backgroundColor:palette}]},
+    options:baseOpts(true)});
+
+  // semanal
+  const weeks = {"Sem 1 (1-5)":0,"Sem 2 (6-12)":0,"Sem 3 (13-19)":0,"Sem 4 (20-26)":0,"Sem 5 (27-31)":0};
+  surgeries.forEach(s=>{
+    const day = parseInt(s.date.slice(8,10));
+    if(day<=5) weeks["Sem 1 (1-5)"]++; else if(day<=12) weeks["Sem 2 (6-12)"]++; else if(day<=19) weeks["Sem 3 (13-19)"]++; else if(day<=26) weeks["Sem 4 (20-26)"]++; else weeks["Sem 5 (27-31)"]++;
+  });
+  chartRefs.sem = new Chart(document.getElementById('chartSemana'), {type:'bar',
+    data:{labels:Object.keys(weeks),datasets:[{label:'Cirurgias',data:Object.values(weeks),backgroundColor:'#6366f1',borderRadius:4}]},
+    options:baseOpts(false)});
+}
+
+function renderHeatmap(){
+  const byDate = {};
+  surgeries.forEach(s=>{ if(s.status!=="Cancelado"){ byDate[s.date]=(byDate[s.date]||0)+1; } });
+
+  // Monta grade de calendário Seg-Sáb (dias de funcionamento da clínica) para julho/2026, agrupada em semanas S1..S5
+  const weeks = [];
+  let current = new Array(6).fill(null);
+  for(let d=1; d<=31; d++){
+    const dow = new Date(2026,6,d).getDay(); // 0=Dom,1=Seg,...6=Sáb
+    if(dow===0) continue; // domingo: clínica fechada, sem célula
+    const idx = dow-1; // Seg=0 ... Sáb=5
+    current[idx] = d;
+    if(idx===5){ weeks.push(current); current = new Array(6).fill(null); }
+  }
+  if(current.some(v=>v!==null)) weeks.push(current);
+
+  const todayDay = parseInt(TODAY.slice(8,10));
+  const currentWeekIdx = weeks.findIndex(w=>w.includes(todayDay));
+  const nextWeekIdx = currentWeekIdx>=0 ? currentWeekIdx+1 : -1;
+
+  const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div></div>`;
+
+  let rowsHtml = '';
+  weeks.forEach((weekCells,w)=>{
+    let weekTotal = 0;
+    const dayCells = weekCells.map(d=>{
+      if(d===null) return `<div class="heat-cell blank"></div>`;
+      const key = `2026-07-${String(d).padStart(2,'0')}`;
+      const count = byDate[key]||0;
+      weekTotal += count;
+      const cls = count>=3 ? 'h3' : count===2 ? 'h2' : count===1 ? 'h1' : 'h0';
+      return `<div class="heat-cell ${cls}" title="${fmtDate(key)}: ${count} cirurgia(s)"><span class="d">${d}</span><span class="c">${count}</span></div>`;
+    }).join('');
+    let rowClass = 'heatmap-row';
+    let tag = '';
+    if(w===currentWeekIdx){ rowClass += ' current-week'; tag = '<div class="tag">Atual</div>'; }
+    else if(w===nextWeekIdx){ rowClass += ' next-week'; tag = '<div class="tag">Próxima</div>'; }
+    const pct = Math.round((weekTotal/18)*100);
+    const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
+    const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de 18 cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
+    rowsHtml += `<div class="${rowClass}"><div class="week-label">S${w+1}${tag}</div>${dayCells}${occCell}</div>`;
+  });
+  document.getElementById('heatmap').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
+}
+
+function renderHeatmapAgosto(){
+  // Monta grade de calendário Seg-Sáb para agosto/2026, mês completo (S1–S5), mesmos critérios do heatmap de julho
+  // Contagem por dia calculada em tempo real a partir de surgeriesAgosto (dados reais)
+  const augustCounts = computeAugustCounts();
+  const weeks = [];
+  let current = new Array(6).fill(null);
+  for(let d=1; d<=31; d++){
+    const dow = new Date(2026,7,d).getDay(); // 0=Dom,1=Seg,...6=Sáb (mês 7 = agosto, index 0-based)
+    if(dow===0) continue; // domingo: clínica fechada, sem célula
+    const idx = dow-1; // Seg=0 ... Sáb=5
+    current[idx] = d;
+    if(idx===5){ weeks.push(current); current = new Array(6).fill(null); }
+  }
+  if(current.some(v=>v!==null)) weeks.push(current);
+
+  const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div></div>`;
+
+  let rowsHtml = '';
+  weeks.forEach((weekCells,w)=>{
+    let weekTotal = 0;
+    const dayCells = weekCells.map(d=>{
+      if(d===null) return `<div class="heat-cell blank"></div>`;
+      const key = `2026-08-${String(d).padStart(2,'0')}`;
+      const count = augustCounts[key]||0;
+      weekTotal += count;
+      const cls = count>=3 ? 'h3' : count===2 ? 'h2' : count===1 ? 'h1' : 'h0';
+      const dLabel = new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      return `<div class="heat-cell ${cls}" title="${dLabel}: ${count} cirurgia(s)"><span class="d">${d}</span><span class="c">${count}</span></div>`;
+    }).join('');
+    const pct = Math.round((weekTotal/18)*100);
+    const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
+    const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de 18 cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
+    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}</div>`;
+  });
+  document.getElementById('heatmapAgosto').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
+}
+
+function renderAgostoList(){
+  const el = document.getElementById('agostoListBody');
+  if(!el) return;
+  const list = [...surgeriesAgosto].sort((a,b)=> a.date.localeCompare(b.date));
+  el.innerHTML = list.map(s=>{
+    const dLabel = new Date(s.date+"T12:00:00").toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+    return `<tr><td>${dLabel}</td><td>${s.patient}</td><td>${s.procedure}</td><td>${s.staff.join(', ')||'—'}</td><td>${fmtMoney(s.value)} ${s.payment?('· '+s.payment):''}</td><td><span class="chip st-${statusClass(s.status)}">${s.status}</span></td></tr>`;
+  }).join('');
+}
+
+// ---------------- EXPORTS ----------------
+function exportCSV(){
+  const headers = ["Data","Paciente","Valor","Pagamento","Equipe","Procedimento","Hospital","Status","Obs"];
+  const rows = surgeries.map(s=>[s.date,s.patient,s.value||'',s.payment,s.staff.join('/'),s.procedure,s.hospital,s.status,s.obs]);
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(["﻿"+csv], {type:'text/csv;charset=utf-8;'});
+  const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'agenda_tc_botafogo_julho.csv'; link.click();
+}
+function exportExcel(){
+  let table = '<table><tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Pagamento</th><th>Equipe</th><th>Procedimento</th><th>Hospital</th><th>Status</th><th>Obs</th></tr>';
+  surgeries.forEach(s=>{ table += `<tr><td>${s.date}</td><td>${s.patient}</td><td>${s.value||''}</td><td>${s.payment}</td><td>${s.staff.join('/')}</td><td>${s.procedure}</td><td>${s.hospital}</td><td>${s.status}</td><td>${s.obs}</td></tr>`; });
+  table += '</table>';
+  const blob = new Blob(['﻿', table], {type:'application/vnd.ms-excel'});
+  const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'agenda_tc_botafogo_julho.xls'; link.click();
+}
+function exportPNG(){
+  alert('Para exportar como imagem PNG: use Ctrl+P / Cmd+P e escolha "Salvar como PDF", ou tire uma captura de tela da agenda. Exportação PNG nativa requer uma biblioteca externa (html2canvas) não incluída neste arquivo offline.');
+}
+
+// ---------------- EVENTS ----------------
+document.getElementById('searchInput').addEventListener('input', e=>{ state.search = e.target.value; renderAgenda(); });
+document.getElementById('fHospital').addEventListener('change', e=>{ state.hospital = e.target.value; renderAgenda(); });
+document.getElementById('fStaff').addEventListener('change', e=>{ state.staff = e.target.value; renderAgenda(); });
+document.getElementById('fStatus').addEventListener('change', e=>{ state.status = e.target.value; renderAgenda(); });
+document.getElementById('fProc').addEventListener('change', e=>{ state.proc = e.target.value; renderAgenda(); });
+document.querySelectorAll('#viewToggle button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); state.view = btn.dataset.v; renderAgenda();
+  });
+});
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-agenda').style.display = t.dataset.tab==='agenda'?'block':'none';
+    document.getElementById('tab-indicadores').style.display = t.dataset.tab==='indicadores'?'block':'none';
+    document.getElementById('tab-historico').style.display = t.dataset.tab==='historico'?'block':'none';
+    if(t.dataset.tab==='indicadores'){ renderCharts(); renderHeatmap(); renderHeatmapAgosto(); renderAgostoList(); }
+  });
+});
+document.getElementById('refreshBtn').addEventListener('click', ()=>{
+  location.href = location.pathname + '?t=' + Date.now();
+});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  localStorage.removeItem('tc-auth');
+  location.reload();
+});
+document.getElementById('exportBtn').addEventListener('click', (e)=>{ e.stopPropagation(); document.getElementById('exportMenu').classList.toggle('show'); });
+document.addEventListener('click', ()=>document.getElementById('exportMenu').classList.remove('show'));
+
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  document.body.classList.toggle('dark');
+  const dark = document.body.classList.contains('dark');
+  document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
+  localStorage.setItem('tc-theme', dark ? 'dark':'light');
+  if(document.getElementById('tab-indicadores').style.display!=='none') renderCharts();
+});
+if(localStorage.getItem('tc-theme')==='dark'){ document.body.classList.add('dark'); document.getElementById('themeBtn').textContent='☀️'; }
+
+function setSidebarCollapsed(collapsed){
+  document.getElementById('sidebarEl').classList.toggle('collapsed', collapsed);
+  document.getElementById('sidebarReopen').classList.toggle('show', collapsed);
+  document.getElementById('sidebarToggle').textContent = collapsed ? '▶ Painel' : '◀ Painel';
+  localStorage.setItem('tc-sidebar-collapsed', collapsed ? '1' : '0');
+}
+document.getElementById('sidebarToggle').addEventListener('click', ()=>{
+  setSidebarCollapsed(!document.getElementById('sidebarEl').classList.contains('collapsed'));
+});
+document.getElementById('sidebarReopen').addEventListener('click', ()=> setSidebarCollapsed(false));
+setSidebarCollapsed(localStorage.getItem('tc-sidebar-collapsed')==='1');
+
+document.getElementById('updatedLabel').textContent = 'Atualizado: ' + LAST_UPDATE;
+
+// ---------------- INIT ----------------
+renderKPIs();
+renderSidebar();
+renderAgenda();
+renderHistory();
+</script>
+</body>
+</html>
