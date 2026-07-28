@@ -329,7 +329,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-07-28 14:06 — Verificação automática: novo paciente Leonardo Vieira incluído no dia 05/08 (grupo Agosto); grupo Julho sem novidades.";
+const LAST_UPDATE = "2026-07-28 16:07 — Verificação automática: sem novidades em ambos os grupos (Julho e Agosto).";
 const TODAY = "2026-07-28";
 
 const surgeries = [
@@ -482,7 +482,8 @@ const history = [
 {ts:"28/07 12:03",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 26/07 16:00, João Pedro Closer Capi Hair, 'Retirando paciente de segunda da agenda pois eletroforese não saiu', já registrada e resolvida em 27/07 10:25 como cancelamento de Maicon Praxedes) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 24/07 11:42, João Pedro Closer Capi Hair, 'Dia 20 com 3'). Nenhuma mensagem nova em nenhum dos dois grupos."},
 {ts:"28/07 14:05",author:"AssucenaTomaz",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 05 — repostagem completa do grupo Agosto (13:09) confirma novo paciente Leonardo Vieira 25k em 12x (JM/A) adicionado à agenda do dia 05/08, passando de 1 para 2 cirurgias no dia."},
 {ts:"28/07 14:05",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho)",msg:"Grupo 'AGENDA TC BOTAFOGO JULHO' reverificado — última mensagem continua sendo a de 26/07 16:00 (João Pedro Closer Capi Hair, 'Retirando paciente de segunda da agenda pois eletroforese não saiu'), já registrada e resolvida em 27/07 10:25 como cancelamento de Maicon Praxedes. Nenhuma mensagem nova."},
-{ts:"28/07 14:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — inclusão de Leonardo Vieira (05/08) aplicada acima. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso, sem novidades."}
+{ts:"28/07 14:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — inclusão de Leonardo Vieira (05/08) aplicada acima. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso, sem novidades."},
+{ts:"28/07 16:07",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto)",msg:"Verificação automática programada — grupo 'AGENDA TC BOTAFOGO JULHO' reverificado (última mensagem ainda é a de 26/07 16:00, João Pedro Closer Capi Hair, 'Retirando paciente de segunda da agenda pois eletroforese não saiu', já registrada e resolvida em 27/07 10:25 como cancelamento de Maicon Praxedes) e grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado (última mensagem ainda é a de 28/07 13:09, AssucenaTomaz, 'Incluindo dia 05', já registrada acima como inclusão de Leonardo Vieira). Nenhuma mensagem nova em nenhum dos dois grupos."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
