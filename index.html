@@ -525,7 +525,8 @@ const history = [
 {ts:"31/07 19:21–19:22",author:"Pré operatorio Capi Hair Plus",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 22 com 02 — repostagem completa confirma segundo paciente Vinícius da Silva do Nascimento 22k PIX (A)(JM) adicionado à agenda do dia 22/08, passando de 1 para 2 cirurgias no dia (junto com Jaime Maciel, já registrado)."},
 {ts:"01/08 12:16",author:"AssucenaTomaz",type:"Inclusão de paciente (Agosto)",msg:"Incluído dia 07 — repostagem completa confirma novo paciente André Luis 13.900 Pix (A) adicionado à agenda do dia 07/08, passando de 1 para 2 cirurgias no dia (junto com Victor Elias Titonelli, já registrado)."},
 {ts:"01/08 13:19",author:"AssucenaTomaz",type:"Inclusão de paciente (Agosto)",msg:"Incluindo dia 13 (mensagem editada) — repostagem completa confirma novo paciente Ricardo Azevedo 12k (A) adicionado à agenda do dia 13/08, passando de 1 para 2 cirurgias no dia (junto com Márcio de Oliveira, já registrado)."},
-{ts:"03/08 09:01",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 3 mensagens novas desde 31/07 16:12 processadas: repostagem de 31/07 19:21 (Pré operatorio Capi Hair Plus, 'Incluindo dia 22 com 02') e repostagens de 01/08 12:16 e 13:19 (AssucenaTomaz, 'Incluído dia 07' e 'Incluindo dia 13'); as duas últimas repostagens completas foram comparadas dia a dia (01/08 a 31/08) contra o array surgeriesAgosto, identificando as três inclusões aplicadas acima (Vinícius da Silva do Nascimento em 22/08, André Luis em 07/08, Ricardo Azevedo em 13/08); demais dias conferem exatamente com os dados já cadastrados, incluindo o dia 11/08 que segue com apenas 2 pacientes — pendência do paciente antecipado para 11/08 (mensagem de 21/07 14:50) permanece não identificada, ver footer-note. Mensagens de Lindomar Capi Hair às 14:45–14:46 de 01/08 eram apenas GIFs/figurinhas sobre o dia 7, sem conteúdo de agenda."}
+{ts:"03/08 09:01",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 3 mensagens novas desde 31/07 16:12 processadas: repostagem de 31/07 19:21 (Pré operatorio Capi Hair Plus, 'Incluindo dia 22 com 02') e repostagens de 01/08 12:16 e 13:19 (AssucenaTomaz, 'Incluído dia 07' e 'Incluindo dia 13'); as duas últimas repostagens completas foram comparadas dia a dia (01/08 a 31/08) contra o array surgeriesAgosto, identificando as três inclusões aplicadas acima (Vinícius da Silva do Nascimento em 22/08, André Luis em 07/08, Ricardo Azevedo em 13/08); demais dias conferem exatamente com os dados já cadastrados, incluindo o dia 11/08 que segue com apenas 2 pacientes — pendência do paciente antecipado para 11/08 (mensagem de 21/07 14:50) permanece não identificada, ver footer-note. Mensagens de Lindomar Capi Hair às 14:45–14:46 de 01/08 eram apenas GIFs/figurinhas sobre o dia 7, sem conteúdo de agenda."},
+{ts:"03/08 09:15",author:"Sistema (ajuste solicitado por Karina)",type:"Correção — semana atual (heatmaps)",msg:"A pedido de Karina: a semana atual passa a ser considerada S2 de Agosto (03/08 a 08/08), que é onde a data de hoje (TODAY=2026-08-03) efetivamente cai. Corrigido bug no heatmap de Julho que ainda marcava S1 de julho como 'Atual' (a detecção comparava apenas o dia do mês, sem checar se TODAY ainda era de julho); agora, com TODAY em agosto, nenhuma semana do heatmap de Julho recebe mais o rótulo Atual/Próxima. Adicionado ao heatmap de Agosto o mesmo destaque visual (rótulo 'Atual'/'Próxima' e contorno) já usado no heatmap de Julho, agora aplicado corretamente à linha S2. O cálculo da meta semanal (100%/75%/50%) já usava TODAY corretamente e não precisou de alteração — S2 já era tratada como offset 0 (meta 100%)."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
@@ -797,8 +798,11 @@ function renderHeatmap(){
     weeks.push(current);
   }
 
-  const todayDay = parseInt(TODAY.slice(8,10));
-  const currentWeekIdx = weeks.findIndex(w=>w.some(c=>c && !c.spill && c.d===todayDay));
+  // Só considera "hoje" dentro da grade de julho se o mês/ano atual (TODAY) ainda for julho/2026 —
+  // depois que a data virar agosto, nenhuma semana de julho deve ficar marcada como Atual/Próxima.
+  const [todayY,todayM,todayD] = TODAY.split('-').map(Number);
+  const todayDay = (todayY===2026 && todayM===7) ? todayD : -1;
+  const currentWeekIdx = todayDay>0 ? weeks.findIndex(w=>w.some(c=>c && !c.spill && c.d===todayDay)) : -1;
   const nextWeekIdx = currentWeekIdx>=0 ? currentWeekIdx+1 : -1;
 
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -882,7 +886,11 @@ function renderHeatmapAgosto(){
     const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de 18 cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
     const weekOffset = weekMonday ? Math.round((weekMonday-currentMonday)/(7*86400000)) : null;
     const metaCell = metaCellHtml(weekTotal, weekOffset);
-    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}${metaCell}</div>`;
+    let rowClass = 'heatmap-row';
+    let tag = '';
+    if(weekOffset===0){ rowClass += ' current-week'; tag = '<div class="tag">Atual</div>'; }
+    else if(weekOffset===1){ rowClass += ' next-week'; tag = '<div class="tag">Próxima</div>'; }
+    rowsHtml += `<div class="${rowClass}"><div class="week-label">S${w+1}${tag}</div>${dayCells}${occCell}${metaCell}</div>`;
   });
   document.getElementById('heatmapAgosto').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
 }
