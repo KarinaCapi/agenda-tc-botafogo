@@ -139,6 +139,15 @@ body.authed #loginGate{display:none;}
 .heat-cell.h3{background:var(--green);color:#fff;}
 .heat-cell.spill{outline:2px dashed rgba(255,255,255,.6);outline-offset:-4px;}
 .heat-cell.spill .d{font-size:14px;}
+.heat-cell.s-green{background:var(--green);color:#fff;}
+.heat-cell.s-yellow{background:var(--yellow);color:#111827;}
+.heat-cell.s-red{background:var(--red);color:#fff;}
+.heat-cell.s-future{background:transparent;border:1px dashed var(--border);color:var(--text-2);}
+.sales-missing{font-size:11px;color:var(--red);font-weight:600;}
+.sales-ok{font-size:11px;color:var(--green);font-weight:600;}
+.branch-pill{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10.5px;font-weight:700;margin-right:4px;}
+.branch-pill.ok{background:var(--green-bg);color:var(--green);}
+.branch-pill.miss{background:var(--red-bg);color:var(--red);}
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{text-align:left;padding:9px 10px;color:var(--text-2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);}
 td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
@@ -227,6 +236,7 @@ tr:last-child td{border-bottom:none;}
       <div class="tabs">
         <div class="tab active" data-tab="agenda">Agenda</div>
         <div class="tab" data-tab="indicadores">Indicadores</div>
+        <div class="tab" data-tab="vendas">Volume de Vendas</div>
         <div class="tab" data-tab="historico">Histórico</div>
       </div>
 
@@ -288,6 +298,37 @@ tr:last-child td{border-bottom:none;}
         </div>
       </div>
 
+      <div id="tab-vendas" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Meta diária: 5 vendas (3 Botafogo · 1 Barra · 1 Goiânia)</h3></div>
+          <div class="kpis" id="vendasKpiRow" style="margin-bottom:0;"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Heatmap de vendas — agosto/2026</h3></div>
+          <div id="vendasHeatmap"></div>
+          <div class="badge-legend">
+            <span><span class="dot" style="background:var(--green)"></span>Verde — meta batida (Botafogo 3 + Barra 1 + Goiânia 1)</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — parcial (alguma venda, meta não completa)</span>
+            <span><span class="dot" style="background:var(--red)"></span>Vermelho — nenhuma venda no dia</span>
+            <span><span class="dot" style="border:2px dashed var(--border);background:transparent"></span>Tracejado — dia futuro / ainda sem dado</span>
+          </div>
+          <div class="empty-note">Fonte: grupo de WhatsApp "Closeres" (relatórios diários de cada closer) · domingo sem célula (sem expediente comercial, mesmo critério do heatmap de cirurgias)</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Detalhamento diário — o que falta por filial</h3></div>
+          <table>
+            <thead><tr><th>Data</th><th>Botafogo</th><th>Barra</th><th>Goiânia</th><th>Total</th><th>Status</th><th>Faltam</th></tr></thead>
+            <tbody id="vendasDetailBody"></tbody>
+          </table>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-box"><h4>Vendas por closer (mês)</h4><canvas id="chartCloser"></canvas></div>
+          <div class="chart-box"><h4>Vendas por filial (mês)</h4><canvas id="chartFilial"></canvas></div>
+          <div class="chart-box" style="grid-column:1/-1;"><h4>Evolução diária — vendas x meta (5/dia)</h4><canvas id="chartVendasDia"></canvas></div>
+        </div>
+        <div class="empty-note">Relatórios extraídos do grupo "Closeres" desde 01/08/2026. Mapeamento closer → filial: João Pedro e Assucena = Botafogo · Fabi = Barra · Tayany e Luana = Goiânia. "Fechamento" de cada relatório = vendas fechadas naquele dia por aquele closer (independente de quem originou a indicação). Nenhum relatório de João Pedro encontrado em 01/08 e 03/08 — Botafogo nesses dias considera só Assucena.</div>
+      </div>
+
       <div id="tab-historico" style="display:none;">
         <div class="panel">
           <div class="panel-head"><h3>Histórico de alterações do grupo</h3></div>
@@ -299,7 +340,7 @@ tr:last-child td{border-bottom:none;}
       </div>
 
       <div class="footer-note">
-        Dados extraídos dos grupos de WhatsApp "AGENDA TC BOTAFOGO JULHO" (repostagem completa mais recente: 29/07/2026 17:51, AssucenaTomaz, conferida linha a linha sem alterações) e "AGENDA TC BOTAFOGO AGOSTO" (repostagem completa mais recente: 04/08/2026 11:59, Pré operatorio Capi Hair Plus, legenda "Retirado paciente cancelado hoje") · Verificado novamente em 04/08/2026 16:03, Julho e Agosto sem novidades (últimas mensagens continuam as mesmas já registradas) · Verificado novamente em 04/08/2026 15:20, Julho e Agosto sem novidades (últimas mensagens continuam as mesmas já registradas) · Verificado novamente em 04/08/2026 12:05, Julho sem novidades; Agosto: paciente Maicon Gonçalves remanejado do dia 04/08 para o dia 12/08 (18.900 em 12x, A) e paciente Cristiano Cantes Gonçalves cancelado no dia 12/08 (13.900 em 10x, A/L) — ambas as alterações identificadas por comparação dia a dia da repostagem completa de 11:59 contra os dados já cadastrados, já que a legenda curta não citava nomes · Verificado em 04/08/2026 10:05, Julho sem novidades; Agosto: pacientes Maicon Cardoso (13/08, 25k em 12x, A) e Vladimir padilha (14/08, 13k em 12x, L/A) incluídos a partir da repostagem completa de 18:52 e da legenda de 19:10 ("Incluindo dia 14/8"); mensagem de 19:10 "Semana 2 fechada" sem dado de agenda · Atualização de 03/08/2026 16:04: paciente Cristiano Cantes Gonçalves incluído no dia 12/08 (13.900 em 10x, A/L), que passa a ter 3 cirurgias (junto com Jose Edison Esteves Jr e Diego ryan) · Atualização de 03/08/2026 14:06: paciente Renan Marques Laterza (05/08) e paciente Victor Fingolo (03/08) cancelados (mensagem de 13:45-13:46, filho autista com problema de saúde / paciente passou mal no dia); pacientes Davi da Silva Cruz (11/08, 9k, JP) e Diego ryan (12/08, 13k à vista, A) incluídos — a inclusão de Davi da Silva Cruz no dia 11/08 resolve a pendência aberta em 21/07/2026 14:50 sobre o paciente antecipado para aquele dia · Verificado novamente em 03/08/2026 12:04 (paciente Tiago Vasconcélos incluído no dia 07/08, 13k (JM)(A) — 4 GIFs sem legenda de Lindomar Capi Hair em 01/08 14:45-14:46 no grupo Agosto seguem sem conteúdo de agenda) · Atualização de 31/07 19:21–01/08 13:19: pacientes Vinícius da Silva do Nascimento (22/08), André Luis (07/08) e Ricardo Azevedo (13/08) incluídos na agenda de Agosto · Atualização de 31/07 14:23-14:35: pacientes Rodrigo Barros e Bruno Souza incluídos no dia 15/08 (Agosto), que passa a ter 3 cirurgias (mensagem 'Incluindo dia 15') · Atualização de 31/07 13:23-13:36: paciente Marco Antônio incluído no dia 06/08 (Agosto), que passa a ter 3 cirurgias; paciente Alana Braga Martins incluído e confirmado no dia 08/08 (Agosto), que passa a ter 3 cirurgias; paciente Márcio de Oliveira remanejado do dia 12/08 para o dia 13/08 (Agosto), identificado por comparação dia a dia das repostagens, sem aviso curto associado · Atualização de 30/07 18:08: paciente Márcio de Oliveira incluído no dia 12/08 (Agosto), que passa a ter 2 cirurgias · Atualização de 29/07 16:07: paciente Ricardo Baense incluído no dia 14/08 (Agosto) — chegou a ser postado no dia 07/08 às 15:56 e foi movido para 14/08 às 16:04 ("Alterando data") antes mesmo de ser salvo no dashboard, então foi registrado direto no dia 14/08 · A partir de 21/07/2026 toda atualização automática relê os dois grupos · Atualização de 28/07 14:05: paciente Leonardo Vieira incluído no dia 05/08 (Agosto) · Atualização de 28/07 18:04: paciente Rafael Neustad incluído no dia 05/08 (Agosto), que passa a ter 3 cirurgias · Atualização de 29/07: paciente Jean da Silva incluído no dia 06/08 (Agosto), que passa a ter 2 cirurgias · Atualização automática programada (verificação a cada 2h, dias úteis) · Sem horário exato informado nas mensagens de origem · "Barra da Tijuca" na descrição indica apenas venda/fechamento pela unidade Barra — a cirurgia é realizada em Botafogo · Mensagem de 21/07 14:50 no grupo Agosto ("Antecipado paciente para dia 11/08") não identificava o paciente na época — pendência resolvida em 03/08/2026 12:50 com a inclusão de Davi da Silva Cruz no dia 11/08 (mensagem "Dia 11 com 3"), que passa a ter 3 pacientes · Conversa de 21/07 15:28-15:30 no grupo Julho sobre antecipar pacientes para os dias 28/29 não identifica nome de paciente — nenhum registro adicional foi alterado; ver aba Histórico · Atualização de 22/07 15:10: paciente Alexandre Todeschine (24/07) cancelado (mãe hospitalizada em estado grave); paciente Ulimar Silva incluído no dia 29/07 · Atualização de 24/07 11:42-12:02: paciente Rodrigo Assumpção incluído no dia 20/08 (Agosto); Renan Marques Laterza (05/08) confirmado; Vinicius Alves da Silva remanejado do dia 28/07 para 30/07 (Julho) · Atualização de 24/07 13:14 – 25/07 10:13: Eucy Pinheiro (Confirmado) e Carlos Júnior incluídos no dia 30/07 (Julho) · Atualização de 27/07 10:25: confirmado manualmente que o paciente citado na mensagem de 26/07 16:00 ("Retirando paciente de segunda da agenda pois eletroforese não saiu") é Maicon Praxedes — Cancelado; dia 27/07 com 2 cirurgias (Jorge Henrique, Sandro Caldeira) · Atualização de 27/07 11:15: releitura criteriosa a pedido de Karina identificou paciente João Pedro incluído no dia 31/07 (repostagem de 26/07 16:00, sem legenda curta associada), que não havia sido capturado antes; dia 31/07 passa a ter 2 cirurgias · "Vagas em aberto" por dia agora calculadas dinamicamente (capacidade de 3/dia menos cirurgias ativas), substituindo valores fixos que ficavam desatualizados
+        Dados extraídos dos grupos de WhatsApp "AGENDA TC BOTAFOGO JULHO" (repostagem completa mais recente: 29/07/2026 17:51, AssucenaTomaz, conferida linha a linha sem alterações), "AGENDA TC BOTAFOGO AGOSTO" (repostagem completa mais recente: 04/08/2026 11:59, Pré operatorio Capi Hair Plus, legenda "Retirado paciente cancelado hoje") e, para a aba Volume de Vendas, do grupo "Closeres" (relatórios diários de João Pedro, Assucena, Fabi, Tayany e Luana; última mensagem lida: 03/08/2026 18:50, Luana Melo — sem mensagens em 04/08 até 04/08/2026 16:35) · PENDÊNCIA (Volume de Vendas): nenhum relatório de João Pedro encontrado no grupo Closeres em 01/08 e 03/08 — Botafogo nesses dias considera só o fechamento de Assucena; números de Botafogo podem estar subestimados se ele tiver fechado vendas sem reportar · Verificado novamente em 04/08/2026 16:03, Julho e Agosto sem novidades (últimas mensagens continuam as mesmas já registradas) · Verificado novamente em 04/08/2026 15:20, Julho e Agosto sem novidades (últimas mensagens continuam as mesmas já registradas) · Verificado novamente em 04/08/2026 12:05, Julho sem novidades; Agosto: paciente Maicon Gonçalves remanejado do dia 04/08 para o dia 12/08 (18.900 em 12x, A) e paciente Cristiano Cantes Gonçalves cancelado no dia 12/08 (13.900 em 10x, A/L) — ambas as alterações identificadas por comparação dia a dia da repostagem completa de 11:59 contra os dados já cadastrados, já que a legenda curta não citava nomes · Verificado em 04/08/2026 10:05, Julho sem novidades; Agosto: pacientes Maicon Cardoso (13/08, 25k em 12x, A) e Vladimir padilha (14/08, 13k em 12x, L/A) incluídos a partir da repostagem completa de 18:52 e da legenda de 19:10 ("Incluindo dia 14/8"); mensagem de 19:10 "Semana 2 fechada" sem dado de agenda · Atualização de 03/08/2026 16:04: paciente Cristiano Cantes Gonçalves incluído no dia 12/08 (13.900 em 10x, A/L), que passa a ter 3 cirurgias (junto com Jose Edison Esteves Jr e Diego ryan) · Atualização de 03/08/2026 14:06: paciente Renan Marques Laterza (05/08) e paciente Victor Fingolo (03/08) cancelados (mensagem de 13:45-13:46, filho autista com problema de saúde / paciente passou mal no dia); pacientes Davi da Silva Cruz (11/08, 9k, JP) e Diego ryan (12/08, 13k à vista, A) incluídos — a inclusão de Davi da Silva Cruz no dia 11/08 resolve a pendência aberta em 21/07/2026 14:50 sobre o paciente antecipado para aquele dia · Verificado novamente em 03/08/2026 12:04 (paciente Tiago Vasconcélos incluído no dia 07/08, 13k (JM)(A) — 4 GIFs sem legenda de Lindomar Capi Hair em 01/08 14:45-14:46 no grupo Agosto seguem sem conteúdo de agenda) · Atualização de 31/07 19:21–01/08 13:19: pacientes Vinícius da Silva do Nascimento (22/08), André Luis (07/08) e Ricardo Azevedo (13/08) incluídos na agenda de Agosto · Atualização de 31/07 14:23-14:35: pacientes Rodrigo Barros e Bruno Souza incluídos no dia 15/08 (Agosto), que passa a ter 3 cirurgias (mensagem 'Incluindo dia 15') · Atualização de 31/07 13:23-13:36: paciente Marco Antônio incluído no dia 06/08 (Agosto), que passa a ter 3 cirurgias; paciente Alana Braga Martins incluído e confirmado no dia 08/08 (Agosto), que passa a ter 3 cirurgias; paciente Márcio de Oliveira remanejado do dia 12/08 para o dia 13/08 (Agosto), identificado por comparação dia a dia das repostagens, sem aviso curto associado · Atualização de 30/07 18:08: paciente Márcio de Oliveira incluído no dia 12/08 (Agosto), que passa a ter 2 cirurgias · Atualização de 29/07 16:07: paciente Ricardo Baense incluído no dia 14/08 (Agosto) — chegou a ser postado no dia 07/08 às 15:56 e foi movido para 14/08 às 16:04 ("Alterando data") antes mesmo de ser salvo no dashboard, então foi registrado direto no dia 14/08 · A partir de 21/07/2026 toda atualização automática relê os dois grupos · Atualização de 28/07 14:05: paciente Leonardo Vieira incluído no dia 05/08 (Agosto) · Atualização de 28/07 18:04: paciente Rafael Neustad incluído no dia 05/08 (Agosto), que passa a ter 3 cirurgias · Atualização de 29/07: paciente Jean da Silva incluído no dia 06/08 (Agosto), que passa a ter 2 cirurgias · Atualização automática programada (verificação a cada 2h, dias úteis) · Sem horário exato informado nas mensagens de origem · "Barra da Tijuca" na descrição indica apenas venda/fechamento pela unidade Barra — a cirurgia é realizada em Botafogo · Mensagem de 21/07 14:50 no grupo Agosto ("Antecipado paciente para dia 11/08") não identificava o paciente na época — pendência resolvida em 03/08/2026 12:50 com a inclusão de Davi da Silva Cruz no dia 11/08 (mensagem "Dia 11 com 3"), que passa a ter 3 pacientes · Conversa de 21/07 15:28-15:30 no grupo Julho sobre antecipar pacientes para os dias 28/29 não identifica nome de paciente — nenhum registro adicional foi alterado; ver aba Histórico · Atualização de 22/07 15:10: paciente Alexandre Todeschine (24/07) cancelado (mãe hospitalizada em estado grave); paciente Ulimar Silva incluído no dia 29/07 · Atualização de 24/07 11:42-12:02: paciente Rodrigo Assumpção incluído no dia 20/08 (Agosto); Renan Marques Laterza (05/08) confirmado; Vinicius Alves da Silva remanejado do dia 28/07 para 30/07 (Julho) · Atualização de 24/07 13:14 – 25/07 10:13: Eucy Pinheiro (Confirmado) e Carlos Júnior incluídos no dia 30/07 (Julho) · Atualização de 27/07 10:25: confirmado manualmente que o paciente citado na mensagem de 26/07 16:00 ("Retirando paciente de segunda da agenda pois eletroforese não saiu") é Maicon Praxedes — Cancelado; dia 27/07 com 2 cirurgias (Jorge Henrique, Sandro Caldeira) · Atualização de 27/07 11:15: releitura criteriosa a pedido de Karina identificou paciente João Pedro incluído no dia 31/07 (repostagem de 26/07 16:00, sem legenda curta associada), que não havia sido capturado antes; dia 31/07 passa a ter 2 cirurgias · "Vagas em aberto" por dia agora calculadas dinamicamente (capacidade de 3/dia menos cirurgias ativas), substituindo valores fixos que ficavam desatualizados
       </div>
     </div>
   </div>
@@ -329,7 +370,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-08-04 16:03 — Verificação automática: Julho e Agosto sem novidades (últimas mensagens continuam as de 29/07 17:51 e 04/08 12:00, já registradas).";
+const LAST_UPDATE = "2026-08-04 16:35 — Nova aba \"Volume de Vendas\" adicionada (a pedido de Karina): heatmap e detalhamento diário do grupo WhatsApp \"Closeres\", meta de 5 vendas/dia (3 Botafogo + 1 Barra + 1 Goiânia), com indicação de quantas vendas faltam por filial em cada dia. Dados de vendas cobrindo 01/08 a 03/08.";
 const TODAY = "2026-08-04";
 
 const surgeries = [
@@ -455,6 +496,59 @@ const surgeriesAgosto = [
 // IMPORTANTE: sempre que um novo mês for adicionado (ex.: surgeriesSetembro), inclua-o aqui também.
 const allSurgeries = [...surgeries, ...surgeriesAgosto];
 
+// ---------------- VOLUME DE VENDAS (grupo WhatsApp "Closeres") ----------------
+// Cada closer envia um "relatório diário" (ou "Relatório") no grupo Closeres com "Quantos atenderam" / "Quantos fecharam".
+// "closed" = quantidade de vendas fechadas naquele relatório (não o valor em R$). Mapeamento closer → filial definido por Karina:
+// João Pedro e Assucena = Botafogo (meta 3/dia) · Fabi = Barra (meta 1/dia) · Tayany e Luana = Goiânia (meta 1/dia). Meta total: 5 vendas/dia.
+const CLOSER_BRANCH = {
+  "João Pedro Closer Capi Hair": "Botafogo",
+  "AssucenaTomaz": "Botafogo",
+  "Fabi Mazzoleni": "Barra",
+  "Tayany": "Goiânia",
+  "Luana Melo": "Goiânia"
+};
+const BRANCH_GOALS = {"Botafogo": 3, "Barra": 1, "Goiânia": 1};
+const DAILY_SALES_GOAL = 5;
+
+const salesReports = [
+{date:"2026-08-01", closer:"Fabi Mazzoleni", attended:1, closed:1, ts:"01/08 11:49", note:"Rubens (Jordana) — R$ 13.900"},
+{date:"2026-08-01", closer:"Luana Melo", attended:2, closed:1, ts:"01/08 12:09", note:"José Antônio (Waleska) — R$ 13.990. Maurício (Waleska) sem dinheiro."},
+{date:"2026-08-01", closer:"Tayany", attended:1, closed:0, ts:"01/08 12:43", note:"Sem fechamento — Paulo Roberto (Whaleska): pagamento do sinal só na segunda-feira (03/08)."},
+{date:"2026-08-03", closer:"Fabi Mazzoleni", attended:0, closed:0, ts:"03/08 18:27", note:"Sem atendimento nem fechamento."},
+{date:"2026-08-03", closer:"AssucenaTomaz", attended:2, closed:1, ts:"03/08 18:40 (editada)", note:"Maicon (Assucena) — R$ 25.000. Tratamento 1 (Luana): vai pagar 10/08. Marlon (Luana): achou caro, buscando outros orçamentos."},
+{date:"2026-08-03", closer:"Tayany", attended:1, closed:1, ts:"03/08 18:43", note:"Alexandre Rechi (Whaleska) — R$ 14.000."},
+{date:"2026-08-03", closer:"Luana Melo", attended:1, closed:0, ts:"03/08 18:50", note:"Sem fechamento — Marcello(ind): filho autista com problema de saúde, mulher pediu para não fazer."}
+];
+// Observação: nenhum relatório de João Pedro foi encontrado no grupo Closeres em 01/08 e 03/08 (releitura do histórico completo do
+// grupo desde 31/07); Botafogo nesses dois dias considera apenas o fechamento relatado por Assucena. 02/08 (domingo) sem nenhum
+// relatório de nenhum closer — considerado dia sem expediente comercial, célula omitida do heatmap (mesmo critério já usado nos
+// heatmaps de cirurgias, que também pulam domingo).
+
+function computeSalesDaily(){
+  const byDate = {};
+  salesReports.forEach(r=>{
+    const branch = CLOSER_BRANCH[r.closer] || "Outro";
+    if(!byDate[r.date]) byDate[r.date] = {branches:{Botafogo:0,Barra:0,"Goiânia":0}, reports:[]};
+    byDate[r.date].branches[branch] = (byDate[r.date].branches[branch]||0) + r.closed;
+    byDate[r.date].reports.push(r);
+  });
+  return byDate;
+}
+function salesDayStatus(dateKey, byDateMap){
+  const day = byDateMap[dateKey];
+  const branches = day ? day.branches : {Botafogo:0,Barra:0,"Goiânia":0};
+  const total = branches.Botafogo + branches.Barra + branches["Goiânia"];
+  const missing = {};
+  let missingTotal = 0;
+  Object.keys(BRANCH_GOALS).forEach(b=>{
+    const gap = Math.max(0, BRANCH_GOALS[b] - (branches[b]||0));
+    if(gap>0) missing[b] = gap;
+    missingTotal += gap;
+  });
+  const status = total===0 ? "red" : missingTotal===0 ? "green" : "yellow";
+  return {total, branches, missing, missingTotal, status, hasReports: !!day, reports: day ? day.reports : []};
+}
+
 const history = [
 {ts:"19/07 15:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@AssucenaTomaz @João Pedro Closer Capi Hair e @Fabi Mazzoleni até segunda eu conto com vcs pra preencher: 24/24 e 29"},
 {ts:"19/07 16:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@Fabi Mazzoleni joga alguns pra cá pra ajudar."},
@@ -558,7 +652,8 @@ const history = [
 {ts:"04/08 12:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 2 mensagens novas desde 03/08 19:10 processadas: repostagem completa de 11:59 e legenda de 12:00 (Pré operatorio Capi Hair Plus, 'Retirado paciente cancelado hoje'), resultando no remanejamento de Maicon Gonçalves (04/08 → 12/08) e no cancelamento de Cristiano Cantes Gonçalves (12/08), aplicados acima."},
 {ts:"04/08 12:30",author:"Sistema (correção solicitada por Karina)",type:"Correção — aba Agenda e heatmap",msg:"A pedido de Karina: corrigido bug em que a aba Agenda (visão '2 Semanas'), os cards 'Cirurgias da Semana'/'Próxima Semana', a barra lateral (Hoje/Amanhã/48h/Pendentes/Cancelamentos), os filtros (Hospital/Equipe/Procedimento) e os gráficos da aba Indicadores só liam o array `surgeries` (Julho), ficando zerados ou incompletos assim que TODAY entrou em agosto. Criado array combinado `allSurgeries` (Julho + Agosto, e futuros meses conforme forem adicionados) e todas essas funções passaram a usá-lo. A visão 'Mês' da Agenda também estava fixa em julho/2026 — agora usa o mês de TODAY dinamicamente. Além disso, `computeAugustCounts()` (contagem por dia usada no heatmap de Agosto e nas células de agosto do heatmap de Julho) passou a excluir pacientes com status Cancelado, para que um cancelamento reduza a contagem do dia imediatamente e um remanejamento mova a contagem para a nova data — antes, um paciente cancelado continuava contando no heatmap do dia original. Validado: semana atual (04-10/08) e próxima semana (11-17/08) com 16 cirurgias ativas cada; dia 12/08 do heatmap agora mostra 3 (excluindo Cristiano Cantes Gonçalves, cancelado); dia 04/08 mostra 2 (Maicon Gonçalves remanejado para 12/08)."},
 {ts:"04/08 15:20",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — última mensagem continua sendo a de 04/08 12:00 ('Retirado paciente cancelado hoje', Pré operatorio Capi Hair Plus), já registrada e já processada (remanejamento de Maicon Gonçalves e cancelamento de Cristiano Cantes Gonçalves); sem mensagens novas em nenhum dos dois grupos."},
-{ts:"04/08 16:03",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — última mensagem continua sendo a de 04/08 12:00 ('Retirado paciente cancelado hoje', Pré operatorio Capi Hair Plus), já registrada e já processada; sem mensagens novas em nenhum dos dois grupos."}
+{ts:"04/08 16:03",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — última mensagem continua sendo a de 04/08 12:00 ('Retirado paciente cancelado hoje', Pré operatorio Capi Hair Plus), já registrada e já processada; sem mensagens novas em nenhum dos dois grupos."},
+{ts:"04/08 16:35",author:"Sistema (a pedido de Karina)",type:"Nova funcionalidade — Volume de Vendas",msg:"Criada a aba 'Volume de Vendas' no dashboard, no mesmo padrão visual da aba Indicadores: heatmap mensal (agosto), KPIs (dias com meta batida/parciais/sem vendas, total por filial), tabela de detalhamento diário (o que falta por filial) e gráficos (vendas por closer, por filial, evolução diária x meta). Fonte: grupo de WhatsApp 'Closeres', lido via Claude in Chrome desde a criação do grupo até hoje (mensagens de 31/07 a 03/08 relidas; nenhuma mensagem de 04/08 até o momento). Meta diária definida por Karina: 5 vendas/dia, sendo 3 Botafogo + 1 Barra + 1 Goiânia. Mapeamento closer → filial: João Pedro Closer Capi Hair e AssucenaTomaz = Botafogo; Fabi Mazzoleni = Barra; Tayany e Luana Melo = Goiânia — 'fechamento' de cada relatório diário do closer conta como venda daquela filial, independentemente de quem originou a indicação (ex.: cliente indicado por Luana mas fechado por Assucena conta para Botafogo). Cores: verde = meta completa (todas as 3 filiais bateram sua cota do dia), amarelo = parcial (alguma venda mas meta incompleta), vermelho = nenhuma venda no dia; dias futuros aparecem com célula tracejada neutra. Dados coletados: 01/08 (Fabi 1/1, Luana 1 fechamento de 2 atendidos, Tayany 0/1 — Barra e Goiânia bateram meta, Botafogo sem registro, dia amarelo); 02/08 (domingo, nenhum relatório enviado por nenhum closer — célula omitida do heatmap, mesmo critério do heatmap de cirurgias); 03/08 (Fabi 0/0, Assucena 1 fechamento de 2 atendidos — Maicon 25k, Tayany 1/1 — Alexandre Rechi 14k, Luana 0 fechamento de 1 atendido — Botafogo 1/3, Barra 0/1, Goiânia 1/1 batida, dia amarelo). Pendência registrada: não foi encontrado nenhum relatório de João Pedro no grupo Closeres em 01/08 nem em 03/08 (releitura completa do histórico do grupo desde 31/07) — Botafogo nesses dois dias considera apenas o fechamento relatado por Assucena; se João Pedro tiver fechado vendas nesses dias sem reportar no grupo, os números de Botafogo estarão subestimados. A pedido de Karina, a leitura do grupo Closeres passa a fazer parte da tarefa agendada automática (a cada 2h, dias úteis), junto com os grupos de agenda cirúrgica."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
@@ -945,6 +1040,140 @@ function renderAgostoList(){
   }).join('');
 }
 
+// ---------------- VOLUME DE VENDAS (renderização) ----------------
+function vendasBusinessDaysSoFar(){
+  const todayDay = parseInt(TODAY.slice(8,10));
+  const days = [];
+  for(let d=1; d<=todayDay; d++){
+    const dow = new Date(2026,7,d).getDay();
+    if(dow===0) continue; // domingo sem expediente comercial
+    days.push(d);
+  }
+  return days;
+}
+function renderVendasKPIs(){
+  const byDate = computeSalesDaily();
+  let green=0, yellow=0, red=0, totalMonth=0;
+  const branchTotals = {Botafogo:0,Barra:0,"Goiânia":0};
+  vendasBusinessDaysSoFar().forEach(d=>{
+    const key = `2026-08-${String(d).padStart(2,'0')}`;
+    const st = salesDayStatus(key, byDate);
+    if(st.status==='green') green++; else if(st.status==='yellow') yellow++; else red++;
+  });
+  salesReports.forEach(r=>{
+    const branch = CLOSER_BRANCH[r.closer] || "Outro";
+    branchTotals[branch] = (branchTotals[branch]||0) + r.closed;
+    totalMonth += r.closed;
+  });
+  const kpis = [
+    {v:green, l:"Dias com meta batida", c:"green"},
+    {v:yellow, l:"Dias parciais", c:"yellow"},
+    {v:red, l:"Dias sem vendas", c:"red"},
+    {v:totalMonth, l:"Total vendas no mês", c:"blue"},
+    {v:branchTotals.Botafogo, l:"Vendas Botafogo", c:"purple"},
+    {v:branchTotals.Barra, l:"Vendas Barra", c:"purple"},
+    {v:branchTotals["Goiânia"], l:"Vendas Goiânia", c:"purple"}
+  ];
+  document.getElementById('vendasKpiRow').innerHTML = kpis.map(k=>`<div class="kpi c-${k.c}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+}
+function renderVendasHeatmap(){
+  const byDate = computeSalesDaily();
+  const weeks = [];
+  let current = new Array(6).fill(null);
+  for(let d=1; d<=31; d++){
+    const dow = new Date(2026,7,d).getDay();
+    if(dow===0) continue;
+    const idx = dow-1;
+    current[idx] = d;
+    if(idx===5){ weeks.push(current); current = new Array(6).fill(null); }
+  }
+  if(current.some(v=>v!==null)) weeks.push(current);
+
+  const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Total</div><div class="hh">Dias c/ meta</div></div>`;
+
+  let rowsHtml = '';
+  weeks.forEach((weekCells,w)=>{
+    let weekTotal = 0, greenDays = 0, businessDays = 0;
+    const dayCells = weekCells.map(d=>{
+      if(d===null) return `<div class="heat-cell blank"></div>`;
+      const key = `2026-08-${String(d).padStart(2,'0')}`;
+      const dLabel = new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      if(key > TODAY){
+        return `<div class="heat-cell s-future" title="${dLabel}: dia futuro, ainda sem dado"><span class="d">${d}</span><span class="c">—</span></div>`;
+      }
+      businessDays++;
+      const st = salesDayStatus(key, byDate);
+      weekTotal += st.total;
+      if(st.status==='green') greenDays++;
+      const cls = 's-'+st.status;
+      const breakdown = `Botafogo ${st.branches.Botafogo}/${BRANCH_GOALS.Botafogo} · Barra ${st.branches.Barra}/${BRANCH_GOALS.Barra} · Goiânia ${st.branches["Goiânia"]}/${BRANCH_GOALS["Goiânia"]}`;
+      return `<div class="heat-cell ${cls}" title="${dLabel}: ${st.total} venda(s) — ${breakdown}"><span class="d">${d}</span><span class="c">${st.total}</span></div>`;
+    }).join('');
+    const occCell = `<div class="week-occ" title="${weekTotal} venda(s) fechada(s) na semana"><span>${weekTotal}</span><span class="pct-label">vendas</span></div>`;
+    const metaCls = businessDays===0 ? 'meta-na' : greenDays===businessDays ? 'meta-hit' : greenDays===0 ? 'meta-miss' : 'meta-warn';
+    const metaCell = `<div class="week-meta ${metaCls}"><span class="meta-line">${businessDays? greenDays+'/'+businessDays : '—'}</span><span class="meta-sub">dias c/ meta</span></div>`;
+    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}${metaCell}</div>`;
+  });
+  document.getElementById('vendasHeatmap').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
+}
+function renderVendasDetail(){
+  const byDate = computeSalesDaily();
+  const branchCell = (st,b) => {
+    const val = st.branches[b]||0, goal = BRANCH_GOALS[b];
+    return `<span class="branch-pill ${val>=goal?'ok':'miss'}">${val}/${goal}</span>`;
+  };
+  let rows = '';
+  vendasBusinessDaysSoFar().forEach(d=>{
+    const key = `2026-08-${String(d).padStart(2,'0')}`;
+    const st = salesDayStatus(key, byDate);
+    const dLabel = new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',weekday:'short'});
+    const statusLabel = st.status==='green' ? '<span class="chip st-confirmado">Meta batida</span>' : st.status==='yellow' ? '<span class="chip st-reagendado">Parcial</span>' : '<span class="chip st-cancelado">Sem vendas</span>';
+    const missingText = st.missingTotal===0 ? '<span class="sales-ok">Nenhuma — meta completa</span>' :
+      '<span class="sales-missing">' + Object.keys(st.missing).map(b=>`${b} (faltam ${st.missing[b]})`).join(', ') + '</span>';
+    rows += `<tr><td>${dLabel}</td><td>${branchCell(st,'Botafogo')}</td><td>${branchCell(st,'Barra')}</td><td>${branchCell(st,'Goiânia')}</td><td><strong>${st.total}/${DAILY_SALES_GOAL}</strong></td><td>${statusLabel}</td><td>${missingText}</td></tr>`;
+  });
+  document.getElementById('vendasDetailBody').innerHTML = rows || '<tr><td colspan="7" class="empty-note">Sem dados no período.</td></tr>';
+}
+function renderVendasCharts(){
+  destroyCharts();
+  const palette = ['#4f46e5','#22c55e','#eab308','#ef4444','#a855f7'];
+
+  const byCloser = {};
+  salesReports.forEach(r=>{ byCloser[r.closer] = (byCloser[r.closer]||0) + r.closed; });
+  chartRefs.closer = new Chart(document.getElementById('chartCloser'), {type:'bar',
+    data:{labels:Object.keys(byCloser),datasets:[{label:'Vendas fechadas',data:Object.values(byCloser),backgroundColor:'#4f46e5',borderRadius:4}]},
+    options:baseOpts(false)});
+
+  const byBranch = {Botafogo:0,Barra:0,"Goiânia":0};
+  salesReports.forEach(r=>{ const b=CLOSER_BRANCH[r.closer]||"Outro"; byBranch[b]=(byBranch[b]||0)+r.closed; });
+  chartRefs.filial = new Chart(document.getElementById('chartFilial'), {type:'doughnut',
+    data:{labels:Object.keys(byBranch),datasets:[{data:Object.values(byBranch),backgroundColor:palette}]},
+    options:baseOpts(true)});
+
+  const byDate = computeSalesDaily();
+  const labels = [], totals = [], metaLine = [];
+  vendasBusinessDaysSoFar().forEach(d=>{
+    const key = `2026-08-${String(d).padStart(2,'0')}`;
+    const st = salesDayStatus(key, byDate);
+    labels.push(new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}));
+    totals.push(st.total);
+    metaLine.push(DAILY_SALES_GOAL);
+  });
+  chartRefs.vendasDia = new Chart(document.getElementById('chartVendasDia'), {
+    data:{labels, datasets:[
+      {type:'bar', label:'Vendas fechadas', data:totals, backgroundColor:'#22c55e', borderRadius:4},
+      {type:'line', label:'Meta (5/dia)', data:metaLine, borderColor:'#ef4444', borderWidth:2, pointRadius:0, fill:false}
+    ]},
+    options:baseOpts(false)});
+}
+function renderVendas(){
+  renderVendasKPIs();
+  renderVendasHeatmap();
+  renderVendasDetail();
+  renderVendasCharts();
+}
+
 // ---------------- EXPORTS ----------------
 function exportCSV(){
   const headers = ["Data","Paciente","Valor","Pagamento","Equipe","Procedimento","Hospital","Status","Obs"];
@@ -982,8 +1211,10 @@ document.querySelectorAll('.tab').forEach(t=>{
     t.classList.add('active');
     document.getElementById('tab-agenda').style.display = t.dataset.tab==='agenda'?'block':'none';
     document.getElementById('tab-indicadores').style.display = t.dataset.tab==='indicadores'?'block':'none';
+    document.getElementById('tab-vendas').style.display = t.dataset.tab==='vendas'?'block':'none';
     document.getElementById('tab-historico').style.display = t.dataset.tab==='historico'?'block':'none';
     if(t.dataset.tab==='indicadores'){ renderCharts(); renderHeatmap(); renderHeatmapAgosto(); renderAgostoList(); }
+    if(t.dataset.tab==='vendas'){ renderVendas(); }
   });
 });
 document.getElementById('refreshBtn').addEventListener('click', ()=>{
@@ -1002,6 +1233,7 @@ document.getElementById('themeBtn').addEventListener('click', ()=>{
   document.getElementById('themeBtn').textContent = dark ? '☀️' : '🌙';
   localStorage.setItem('tc-theme', dark ? 'dark':'light');
   if(document.getElementById('tab-indicadores').style.display!=='none') renderCharts();
+  if(document.getElementById('tab-vendas').style.display!=='none') renderVendasCharts();
 });
 if(localStorage.getItem('tc-theme')==='dark'){ document.body.classList.add('dark'); document.getElementById('themeBtn').textContent='☀️'; }
 
