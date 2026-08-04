@@ -329,7 +329,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-08-04 12:05 — Agosto: Maicon Gonçalves remanejado de 04/08 para 12/08 e Cristiano Cantes Gonçalves cancelado (12/08), a partir da repostagem completa + legenda 'Retirado paciente cancelado hoje' (Pré operatorio Capi Hair Plus, 11:59-12:00). Julho: sem novidades, última mensagem continua sendo 'Editando valor na agenda' (AssucenaTomaz, 29/07 17:51).";
+const LAST_UPDATE = "2026-08-04 12:30 — Correção: aba Agenda, cards de semana atual/próxima, barra lateral, filtros e indicadores agora consideram Julho+Agosto juntos (antes zeravam ao entrar em agosto); heatmap passa a excluir cancelados da contagem por dia. Dados: Maicon Gonçalves remanejado de 04/08 para 12/08 e Cristiano Cantes Gonçalves cancelado (12/08).";
 const TODAY = "2026-08-04";
 
 const surgeries = [
@@ -449,6 +449,12 @@ const surgeriesAgosto = [
 {id:1053,date:"2026-08-14",patient:"Vladimir padilha",value:13000,payment:"12x",staff:["L","A"],procedure:"Transplante Capilar",hospital:"Capi Hair Botafogo",status:"Agendado",obs:"Incluído em 03/08 19:10 — repostagem completa (AssucenaTomaz), legenda 'Incluindo dia 14/8'; dia 14/08 passa de 2 para 3 cirurgias (junto com Filipe Class Pessanha e Ricardo Baense, já registrados)."}
 ];
 
+// Array combinado (Julho + Agosto) — fonte única para tudo que precisa considerar "a agenda toda" em tempo real
+// (KPIs, barra lateral, aba Agenda, filtros, indicadores e exportações). Os arrays surgeries/surgeriesAgosto
+// continuam existindo separadamente para os heatmaps e a lista específica de Agosto, que são por mês.
+// IMPORTANTE: sempre que um novo mês for adicionado (ex.: surgeriesSetembro), inclua-o aqui também.
+const allSurgeries = [...surgeries, ...surgeriesAgosto];
+
 const history = [
 {ts:"19/07 15:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@AssucenaTomaz @João Pedro Closer Capi Hair e @Fabi Mazzoleni até segunda eu conto com vcs pra preencher: 24/24 e 29"},
 {ts:"19/07 16:47",author:"AssucenaTomaz",type:"Coordenação",msg:"@Fabi Mazzoleni joga alguns pra cá pra ajudar."},
@@ -549,13 +555,14 @@ const history = [
 {ts:"03/08 19:10",author:"AssucenaTomaz",type:"Coordenação",msg:"Semana 2 fechada — sem alteração de dados; mensagem de encerramento da revisão da semana 2 de agosto."},
 {ts:"04/08 10:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 3 mensagens novas desde 03/08 15:53 processadas: repostagem completa de 18:52 (AssucenaTomaz, 'Incluindo dia 13. Com 3'), legenda de 19:10 ('Incluindo dia 14/8') e mensagem de coordenação de 19:10 ('Semana 2 fechada', sem dado de agenda). A repostagem completa (única e integral, sem truncamento) foi comparada dia a dia (01/08 a 31/08) contra o array surgeriesAgosto: duas inclusões identificadas — Maicon Cardoso no dia 13/08 e Vladimir padilha no dia 14/08, aplicadas acima. Demais dias conferem exatamente com os dados já cadastrados."},
 {ts:"04/08 11:59–12:00",author:"Pré operatorio Capi Hair Plus",type:"Cancelamento (Agosto)",msg:"Repostagem completa integral de 11:59 seguida da legenda curta 'Retirado paciente cancelado hoje' (12:00). Comparação dia a dia (01/08 a 31/08) contra o array surgeriesAgosto encontrou exatamente duas diferenças: (1) dia 04/08 deixou de mostrar Maicon Gonçalves (18.900 em 12x, A); (2) dia 12/08 passou a mostrar Maicon Gonçalves (mesmo valor/forma de pagamento/equipe) na vaga antes ocupada por Cristiano Cantes Gonçalves (13.900 em 10x, A/L), que desapareceu da repostagem. Interpretação: Maicon Gonçalves foi remanejado de 04/08 para 12/08 (sem legenda curta própria, mesmo padrão de casos anteriores como João Pedro em 26/07 e Márcio de Oliveira em 31/07); Cristiano Cantes Gonçalves foi cancelado — é o paciente referido na legenda 'Retirado paciente cancelado hoje', identificado por eliminação já que a mensagem não citava nome. Ambas as alterações aplicadas acima."},
-{ts:"04/08 12:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 2 mensagens novas desde 03/08 19:10 processadas: repostagem completa de 11:59 e legenda de 12:00 (Pré operatorio Capi Hair Plus, 'Retirado paciente cancelado hoje'), resultando no remanejamento de Maicon Gonçalves (04/08 → 12/08) e no cancelamento de Cristiano Cantes Gonçalves (12/08), aplicados acima."}
+{ts:"04/08 12:05",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 2 mensagens novas desde 03/08 19:10 processadas: repostagem completa de 11:59 e legenda de 12:00 (Pré operatorio Capi Hair Plus, 'Retirado paciente cancelado hoje'), resultando no remanejamento de Maicon Gonçalves (04/08 → 12/08) e no cancelamento de Cristiano Cantes Gonçalves (12/08), aplicados acima."},
+{ts:"04/08 12:30",author:"Sistema (correção solicitada por Karina)",type:"Correção — aba Agenda e heatmap",msg:"A pedido de Karina: corrigido bug em que a aba Agenda (visão '2 Semanas'), os cards 'Cirurgias da Semana'/'Próxima Semana', a barra lateral (Hoje/Amanhã/48h/Pendentes/Cancelamentos), os filtros (Hospital/Equipe/Procedimento) e os gráficos da aba Indicadores só liam o array `surgeries` (Julho), ficando zerados ou incompletos assim que TODAY entrou em agosto. Criado array combinado `allSurgeries` (Julho + Agosto, e futuros meses conforme forem adicionados) e todas essas funções passaram a usá-lo. A visão 'Mês' da Agenda também estava fixa em julho/2026 — agora usa o mês de TODAY dinamicamente. Além disso, `computeAugustCounts()` (contagem por dia usada no heatmap de Agosto e nas células de agosto do heatmap de Julho) passou a excluir pacientes com status Cancelado, para que um cancelamento reduza a contagem do dia imediatamente e um remanejamento mova a contagem para a nova data — antes, um paciente cancelado continuava contando no heatmap do dia original. Validado: semana atual (04-10/08) e próxima semana (11-17/08) com 16 cirurgias ativas cada; dia 12/08 do heatmap agora mostra 3 (excluindo Cristiano Cantes Gonçalves, cancelado); dia 04/08 mostra 2 (Maicon Gonçalves remanejado para 12/08)."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
 function computeOpenSlots(){
   const counts = {};
-  surgeries.forEach(s=>{ if(s.status!=="Cancelado"){ counts[s.date]=(counts[s.date]||0)+1; } });
+  allSurgeries.forEach(s=>{ if(s.status!=="Cancelado"){ counts[s.date]=(counts[s.date]||0)+1; } });
   const slots = {};
   Object.keys(counts).forEach(d=>{ const open = 3-counts[d]; if(open>0) slots[d]=open; });
   return slots;
@@ -563,9 +570,12 @@ function computeOpenSlots(){
 const openSlots = computeOpenSlots();
 
 // Contagem de cirurgias por dia — agosto/2026, mês completo (S1–S5), calculada em tempo real a partir de surgeriesAgosto (dados reais por paciente extraídos do grupo "AGENDA TC BOTAFOGO AGOSTO")
+// Exclui pacientes com status Cancelado, para que o painel de heatmap sempre reflita o número real de cirurgias ativas
+// (um cancelamento reduz a contagem do dia na hora; um remanejamento move a contagem para a nova data automaticamente,
+// já que o campo `date` do registro é atualizado em vez de criar um novo registro).
 function computeAugustCounts(){
   const counts = {};
-  surgeriesAgosto.forEach(s=>{ counts[s.date] = (counts[s.date]||0) + 1; });
+  surgeriesAgosto.forEach(s=>{ if(s.status!=="Cancelado"){ counts[s.date] = (counts[s.date]||0) + 1; } });
   return counts;
 }
 
@@ -617,24 +627,26 @@ function fillSelect(id, values){
   const sel = document.getElementById(id);
   values.forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
 }
-fillSelect('fHospital', uniq(surgeries.map(s=>s.hospital)));
-fillSelect('fStaff', uniq(surgeries.flatMap(s=>s.staff)).sort());
+fillSelect('fHospital', uniq(allSurgeries.map(s=>s.hospital)));
+fillSelect('fStaff', uniq(allSurgeries.flatMap(s=>s.staff)).sort());
 fillSelect('fStatus', ["Agendado","Confirmado","Reagendado","Cancelado","Alta Prioridade"]);
-fillSelect('fProc', uniq(surgeries.map(s=>s.procedure)));
+fillSelect('fProc', uniq(allSurgeries.map(s=>s.procedure)));
 
 // ---------------- KPI ----------------
 function renderKPIs(){
-  const total = surgeries.length;
+  const total = allSurgeries.length;
   // Janelas dinâmicas relativas a TODAY (7 dias corridos): semana atual = hoje..+6, próxima semana = +7..+13
+  // Usa allSurgeries (Julho + Agosto, e futuros meses) para que os cards sempre reflitam a semana atual/próxima
+  // corretamente, independente de qual mês TODAY estiver.
   const addDaysStr = (dstr,n) => { const d=new Date(dstr+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
   const weekStart = TODAY, weekEndDyn = addDaysStr(TODAY,6);
   const nextWeekStart = addDaysStr(TODAY,7), nextWeekEnd = addDaysStr(TODAY,13);
-  const weekCount = surgeries.filter(s=>s.date>=weekStart&&s.date<=weekEndDyn&&s.status!=="Cancelado").length;
-  const nextWeekCount = surgeries.filter(s=>s.date>=nextWeekStart&&s.date<=nextWeekEnd&&s.status!=="Cancelado").length;
-  const cancel = surgeries.filter(s=>s.status==="Cancelado").length;
-  const resched = surgeries.filter(s=>s.status==="Reagendado").length;
-  const confirmed = surgeries.filter(s=>s.status==="Confirmado").length;
-  const pending = surgeries.filter(s=>s.status==="Agendado").length;
+  const weekCount = allSurgeries.filter(s=>s.date>=weekStart&&s.date<=weekEndDyn&&s.status!=="Cancelado").length;
+  const nextWeekCount = allSurgeries.filter(s=>s.date>=nextWeekStart&&s.date<=nextWeekEnd&&s.status!=="Cancelado").length;
+  const cancel = allSurgeries.filter(s=>s.status==="Cancelado").length;
+  const resched = allSurgeries.filter(s=>s.status==="Reagendado").length;
+  const confirmed = allSurgeries.filter(s=>s.status==="Confirmado").length;
+  const pending = allSurgeries.filter(s=>s.status==="Agendado").length;
   const kpis = [
     {v:total,l:"Total de Cirurgias",c:"ink"},
     {v:weekCount,l:"Cirurgias da Semana",c:"blue"},
@@ -650,11 +662,11 @@ function renderKPIs(){
 // ---------------- SIDEBAR ----------------
 function renderSidebar(){
   const tomorrowStr = (()=>{ const d=new Date(TODAY+"T12:00:00"); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); })();
-  const today = surgeries.filter(s=>s.date===TODAY && s.status!=="Cancelado");
-  const tomorrow = surgeries.filter(s=>s.date===tomorrowStr && s.status!=="Cancelado");
-  const in48 = surgeries.filter(s=>daysBetween(TODAY,s.date)>=0 && daysBetween(TODAY,s.date)<=2 && s.status!=="Cancelado");
-  const pending = surgeries.filter(s=>s.status==="Agendado");
-  const cancelled = surgeries.filter(s=>s.status==="Cancelado");
+  const today = allSurgeries.filter(s=>s.date===TODAY && s.status!=="Cancelado");
+  const tomorrow = allSurgeries.filter(s=>s.date===tomorrowStr && s.status!=="Cancelado");
+  const in48 = allSurgeries.filter(s=>daysBetween(TODAY,s.date)>=0 && daysBetween(TODAY,s.date)<=2 && s.status!=="Cancelado");
+  const pending = allSurgeries.filter(s=>s.status==="Agendado");
+  const cancelled = allSurgeries.filter(s=>s.status==="Cancelado");
 
   document.getElementById('sideToday').textContent = today.length;
   document.getElementById('sideTomorrow').textContent = tomorrow.length;
@@ -675,14 +687,14 @@ function viewRange(){
   if(state.view==="dia"){ start=new Date(today); end=new Date(today); }
   else if(state.view==="semana"){ start=new Date(today); end=new Date(today); end.setDate(end.getDate()+6); }
   else if(state.view==="2semanas"){ start=new Date(today); end=new Date(today); end.setDate(end.getDate()+13); }
-  else { start=new Date(2026,6,1); end=new Date(2026,6,31); }
+  else { const [y,m] = TODAY.split('-').map(Number); start=new Date(y,m-1,1); end=new Date(y,m,0); } // "Mês": mês corrente de TODAY (dinâmico, não fixo em julho)
   const iso = d => d.toISOString().slice(0,10);
   return [iso(start), iso(end)];
 }
 
 function filteredSurgeries(){
   const [start,end] = viewRange();
-  return surgeries.filter(s=>{
+  return allSurgeries.filter(s=>{
     if(s.date<start||s.date>end) return false;
     if(state.hospital && s.hospital!==state.hospital) return false;
     if(state.staff && !s.staff.includes(state.staff)) return false;
@@ -745,9 +757,9 @@ function renderCharts(){
   destroyCharts();
   const palette = ['#4f46e5','#22c55e','#eab308','#ef4444','#a855f7','#3b82f6','#f97316','#14b8a6','#ec4899'];
 
-  // por dia
+  // por dia (todos os meses cadastrados; chave é a data completa, sem colisão entre meses)
   const byDate = {};
-  surgeries.forEach(s=>{ if(s.status!=="Cancelado"){ byDate[s.date]=(byDate[s.date]||0)+1; } });
+  allSurgeries.forEach(s=>{ if(s.status!=="Cancelado"){ byDate[s.date]=(byDate[s.date]||0)+1; } });
   const dateKeys = Object.keys(byDate).sort();
   chartRefs.dia = new Chart(document.getElementById('chartDia'), {type:'bar',
     data:{labels:dateKeys.map(fmtDate),datasets:[{label:'Cirurgias',data:dateKeys.map(k=>byDate[k]),backgroundColor:'#4f46e5',borderRadius:4}]},
@@ -755,37 +767,40 @@ function renderCharts(){
 
   // por médico
   const byStaff = {};
-  surgeries.forEach(s=>s.staff.forEach(st=>{byStaff[st]=(byStaff[st]||0)+1;}));
+  allSurgeries.forEach(s=>s.staff.forEach(st=>{byStaff[st]=(byStaff[st]||0)+1;}));
   chartRefs.medico = new Chart(document.getElementById('chartMedico'), {type:'bar',
     data:{labels:Object.keys(byStaff),datasets:[{label:'Cirurgias',data:Object.values(byStaff),backgroundColor:'#22c55e',borderRadius:4}]},
     options:baseOpts(false)});
 
   // por procedimento
   const byProc = {};
-  surgeries.forEach(s=>{byProc[s.procedure]=(byProc[s.procedure]||0)+1;});
+  allSurgeries.forEach(s=>{byProc[s.procedure]=(byProc[s.procedure]||0)+1;});
   chartRefs.proc = new Chart(document.getElementById('chartProc'), {type:'doughnut',
     data:{labels:Object.keys(byProc),datasets:[{data:Object.values(byProc),backgroundColor:palette}]},
     options:baseOpts(true)});
 
   // por status
   const byStatus = {};
-  surgeries.forEach(s=>{byStatus[s.status]=(byStatus[s.status]||0)+1;});
+  allSurgeries.forEach(s=>{byStatus[s.status]=(byStatus[s.status]||0)+1;});
   chartRefs.status = new Chart(document.getElementById('chartStatus'), {type:'doughnut',
     data:{labels:Object.keys(byStatus),datasets:[{data:Object.values(byStatus),backgroundColor:Object.keys(byStatus).map(statusColor)}]},
     options:baseOpts(true)});
 
   // por hospital
   const byHosp = {};
-  surgeries.forEach(s=>{byHosp[s.hospital]=(byHosp[s.hospital]||0)+1;});
+  allSurgeries.forEach(s=>{byHosp[s.hospital]=(byHosp[s.hospital]||0)+1;});
   chartRefs.hosp = new Chart(document.getElementById('chartHospital'), {type:'pie',
     data:{labels:Object.keys(byHosp),datasets:[{data:Object.values(byHosp),backgroundColor:palette}]},
     options:baseOpts(true)});
 
-  // semanal
-  const weeks = {"Sem 1 (1-5)":0,"Sem 2 (6-12)":0,"Sem 3 (13-19)":0,"Sem 4 (20-26)":0,"Sem 5 (27-31)":0};
-  surgeries.forEach(s=>{
+  // semanal — agrupado por mês+semana (não apenas dia-do-mês) para não misturar julho e agosto no mesmo bucket
+  const weeks = {};
+  allSurgeries.forEach(s=>{
     const day = parseInt(s.date.slice(8,10));
-    if(day<=5) weeks["Sem 1 (1-5)"]++; else if(day<=12) weeks["Sem 2 (6-12)"]++; else if(day<=19) weeks["Sem 3 (13-19)"]++; else if(day<=26) weeks["Sem 4 (20-26)"]++; else weeks["Sem 5 (27-31)"]++;
+    const monthLabel = s.date.slice(0,7); // "2026-08"
+    const bucket = day<=5?"Sem 1 (1-5)":day<=12?"Sem 2 (6-12)":day<=19?"Sem 3 (13-19)":day<=26?"Sem 4 (20-26)":"Sem 5 (27-31)";
+    const key = `${monthLabel} · ${bucket}`;
+    weeks[key] = (weeks[key]||0)+1;
   });
   chartRefs.sem = new Chart(document.getElementById('chartSemana'), {type:'bar',
     data:{labels:Object.keys(weeks),datasets:[{label:'Cirurgias',data:Object.values(weeks),backgroundColor:'#6366f1',borderRadius:4}]},
@@ -931,14 +946,14 @@ function renderAgostoList(){
 // ---------------- EXPORTS ----------------
 function exportCSV(){
   const headers = ["Data","Paciente","Valor","Pagamento","Equipe","Procedimento","Hospital","Status","Obs"];
-  const rows = surgeries.map(s=>[s.date,s.patient,s.value||'',s.payment,s.staff.join('/'),s.procedure,s.hospital,s.status,s.obs]);
+  const rows = allSurgeries.map(s=>[s.date,s.patient,s.value||'',s.payment,s.staff.join('/'),s.procedure,s.hospital,s.status,s.obs]);
   const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob(["﻿"+csv], {type:'text/csv;charset=utf-8;'});
   const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'agenda_tc_botafogo_julho.csv'; link.click();
 }
 function exportExcel(){
   let table = '<table><tr><th>Data</th><th>Paciente</th><th>Valor</th><th>Pagamento</th><th>Equipe</th><th>Procedimento</th><th>Hospital</th><th>Status</th><th>Obs</th></tr>';
-  surgeries.forEach(s=>{ table += `<tr><td>${s.date}</td><td>${s.patient}</td><td>${s.value||''}</td><td>${s.payment}</td><td>${s.staff.join('/')}</td><td>${s.procedure}</td><td>${s.hospital}</td><td>${s.status}</td><td>${s.obs}</td></tr>`; });
+  allSurgeries.forEach(s=>{ table += `<tr><td>${s.date}</td><td>${s.patient}</td><td>${s.value||''}</td><td>${s.payment}</td><td>${s.staff.join('/')}</td><td>${s.procedure}</td><td>${s.hospital}</td><td>${s.status}</td><td>${s.obs}</td></tr>`; });
   table += '</table>';
   const blob = new Blob(['﻿', table], {type:'application/vnd.ms-excel'});
   const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'agenda_tc_botafogo_julho.xls'; link.click();
