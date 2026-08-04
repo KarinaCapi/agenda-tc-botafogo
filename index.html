@@ -370,7 +370,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-08-04 16:35 — Nova aba \"Volume de Vendas\" adicionada (a pedido de Karina): heatmap e detalhamento diário do grupo WhatsApp \"Closeres\", meta de 5 vendas/dia (3 Botafogo + 1 Barra + 1 Goiânia), com indicação de quantas vendas faltam por filial em cada dia. Dados de vendas cobrindo 01/08 a 03/08.";
+const LAST_UPDATE = "2026-08-04 17:05 — Ajuste na aba \"Volume de Vendas\" (a pedido de Karina): coluna semanal do heatmap agora mostra Meta Semanal (5 vendas/dia × dias úteis seg-sáb da semana, ex.: 5 numa semana de 1 dia útil, 30 numa semana cheia), com a semana atual destacada e cores de alerta (verde = meta batida, amarelo = semana em andamento, vermelho = semana já concluída sem bater a meta).";
 const TODAY = "2026-08-04";
 
 const surgeries = [
@@ -1089,31 +1089,48 @@ function renderVendasHeatmap(){
   }
   if(current.some(v=>v!==null)) weeks.push(current);
 
+  const todayDayNum = parseInt(TODAY.slice(8,10));
+  const currentWeekIdx = weeks.findIndex(week => week.includes(todayDayNum));
+
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Total</div><div class="hh">Dias c/ meta</div></div>`;
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Total</div><div class="hh">Meta semanal</div></div>`;
 
   let rowsHtml = '';
   weeks.forEach((weekCells,w)=>{
-    let weekTotal = 0, greenDays = 0, businessDays = 0;
+    // Meta semanal = 5 vendas/dia × dias úteis (seg-sáb) da semana dentro de agosto (semanas parciais na virada do mês
+    // têm meta proporcional aos dias que de fato existem nessa semana — ex.: semana com só sábado 01/08 tem meta 5, não 30).
+    let weekTotal = 0; // vendas já fechadas na semana (dias futuros contam 0 automaticamente, ainda sem dado)
+    let weekBusinessDays = 0; // total de dias úteis da semana (passados + futuros), define a meta da semana
+    let weekLastDay = null; // último dia útil da semana, usado para saber se a semana já terminou
     const dayCells = weekCells.map(d=>{
       if(d===null) return `<div class="heat-cell blank"></div>`;
+      weekBusinessDays++;
+      weekLastDay = d;
       const key = `2026-08-${String(d).padStart(2,'0')}`;
       const dLabel = new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
       if(key > TODAY){
         return `<div class="heat-cell s-future" title="${dLabel}: dia futuro, ainda sem dado"><span class="d">${d}</span><span class="c">—</span></div>`;
       }
-      businessDays++;
       const st = salesDayStatus(key, byDate);
       weekTotal += st.total;
-      if(st.status==='green') greenDays++;
       const cls = 's-'+st.status;
       const breakdown = `Botafogo ${st.branches.Botafogo}/${BRANCH_GOALS.Botafogo} · Barra ${st.branches.Barra}/${BRANCH_GOALS.Barra} · Goiânia ${st.branches["Goiânia"]}/${BRANCH_GOALS["Goiânia"]}`;
       return `<div class="heat-cell ${cls}" title="${dLabel}: ${st.total} venda(s) — ${breakdown}"><span class="d">${d}</span><span class="c">${st.total}</span></div>`;
     }).join('');
+    const weekTarget = weekBusinessDays * DAILY_SALES_GOAL;
+    // Semana "concluída" = o último dia útil dela já passou (é anterior a hoje). Se o último dia é hoje, a semana
+    // ainda está em andamento (o dia de hoje pode receber mais vendas até o fim do expediente).
+    const weekConcluded = weekLastDay!==null && `2026-08-${String(weekLastDay).padStart(2,'0')}` < TODAY;
     const occCell = `<div class="week-occ" title="${weekTotal} venda(s) fechada(s) na semana"><span>${weekTotal}</span><span class="pct-label">vendas</span></div>`;
-    const metaCls = businessDays===0 ? 'meta-na' : greenDays===businessDays ? 'meta-hit' : greenDays===0 ? 'meta-miss' : 'meta-warn';
-    const metaCell = `<div class="week-meta ${metaCls}"><span class="meta-line">${businessDays? greenDays+'/'+businessDays : '—'}</span><span class="meta-sub">dias c/ meta</span></div>`;
-    rowsHtml += `<div class="heatmap-row"><div class="week-label">S${w+1}</div>${dayCells}${occCell}${metaCell}</div>`;
+    let metaCls, metaSub;
+    if(weekTotal >= weekTarget){ metaCls='meta-hit'; metaSub='meta batida! 🎉'; }
+    else if(weekConcluded){ metaCls='meta-miss'; metaSub='meta não batida'; }
+    else { metaCls='meta-warn'; metaSub='em andamento'; }
+    const metaCell = `<div class="week-meta ${metaCls}" title="Meta da semana: ${weekTarget} vendas (5/dia × ${weekBusinessDays} dia(s) útil(eis))"><span class="meta-line">${weekTotal}/${weekTarget}</span><span class="meta-sub">${metaSub}</span></div>`;
+    let rowClass = 'heatmap-row';
+    let tag = '';
+    if(w===currentWeekIdx){ rowClass += ' current-week'; tag = '<div class="tag">Atual</div>'; }
+    rowsHtml += `<div class="${rowClass}"><div class="week-label">S${w+1}${tag}</div>${dayCells}${occCell}${metaCell}</div>`;
   });
   document.getElementById('vendasHeatmap').innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
 }
