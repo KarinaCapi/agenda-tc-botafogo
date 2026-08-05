@@ -326,7 +326,7 @@ tr:last-child td{border-bottom:none;}
           <div class="chart-box"><h4>Vendas por filial (mês)</h4><canvas id="chartFilial"></canvas></div>
           <div class="chart-box" style="grid-column:1/-1;"><h4>Evolução diária — vendas x meta (5/dia)</h4><canvas id="chartVendasDia"></canvas></div>
         </div>
-        <div class="empty-note">Relatórios extraídos do grupo "Closeres" desde 01/08/2026. Mapeamento closer → filial: João Pedro e Assucena = Botafogo · Fabi = Barra · Tayany e Luana = Goiânia. "Fechamento" de cada relatório = vendas fechadas naquele dia por aquele closer (independente de quem originou a indicação). Nenhum relatório de João Pedro encontrado em 01/08 e 03/08 — Botafogo nesses dias considera só Assucena.</div>
+        <div class="empty-note">Relatórios extraídos do grupo "Closeres" desde 01/08/2026. Mapeamento closer → filial: João Pedro e Assucena = Botafogo · Fabi = Barra · Tayany e Luana = Goiânia. Esta aba conta somente vendas de <strong>transplante capilar</strong> — vendas de tratamento (ex.: Jhonathan Geyson e Wellison em 04/08) ficam registradas no relatório para histórico, mas não entram na meta diária, no heatmap, nos KPIs nem nos gráficos. Nenhum relatório de João Pedro encontrado em 01/08 e 03/08 — Botafogo nesses dias considera só Assucena.</div>
       </div>
 
       <div id="tab-historico" style="display:none;">
@@ -370,7 +370,7 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-08-05 10:06 — Julho, Agosto e Closeres sem novidades desde a última execução (09:39). Pendência de vendas (indicações soltas de Tayany/Assucena/João Pedro/Luana em resposta à cobrança de Vanessa) permanece em aberto.";
+const LAST_UPDATE = "2026-08-05 11:12 — A pedido de Karina, a aba Volume de Vendas passou a contar somente vendas de transplante capilar (campo closedTransplante), excluindo vendas de tratamento (Jhonathan Geyson e Wellison, ambos 04/08) da meta diária/heatmap/KPIs/gráficos. Pendência de vendas (indicações soltas de Tayany/Assucena/João Pedro/Luana em resposta à cobrança de Vanessa) permanece em aberto.";
 const TODAY = "2026-08-05";
 
 const surgeries = [
@@ -510,31 +510,37 @@ const CLOSER_BRANCH = {
 const BRANCH_GOALS = {"Botafogo": 3, "Barra": 1, "Goiânia": 1};
 const DAILY_SALES_GOAL = 5;
 
+// Campo `closed` = total de fechamentos do relatório (inclui transplante + tratamento), mantido para auditoria/histórico.
+// Campo `closedTransplante` = quantos desses fechamentos são efetivamente cirurgia de transplante capilar (exclui "tratamento"),
+// que é o número usado em toda a aba Volume de Vendas (KPIs, heatmap, meta diária, gráficos) a partir de 05/08/2026, a pedido de Karina.
 const salesReports = [
-{date:"2026-08-01", closer:"Fabi Mazzoleni", attended:1, closed:1, ts:"01/08 11:49", note:"Rubens (Jordana) — R$ 13.900"},
-{date:"2026-08-01", closer:"Luana Melo", attended:2, closed:1, ts:"01/08 12:09", note:"José Antônio (Waleska) — R$ 13.990. Maurício (Waleska) sem dinheiro."},
-{date:"2026-08-01", closer:"Tayany", attended:1, closed:0, ts:"01/08 12:43", note:"Sem fechamento — Paulo Roberto (Whaleska): pagamento do sinal só na segunda-feira (03/08)."},
-{date:"2026-08-03", closer:"Fabi Mazzoleni", attended:0, closed:0, ts:"03/08 18:27", note:"Sem atendimento nem fechamento."},
-{date:"2026-08-03", closer:"AssucenaTomaz", attended:2, closed:1, ts:"03/08 18:40 (editada)", note:"Maicon (Assucena) — R$ 25.000. Tratamento 1 (Luana): vai pagar 10/08. Marlon (Luana): achou caro, buscando outros orçamentos."},
-{date:"2026-08-03", closer:"Tayany", attended:1, closed:1, ts:"03/08 18:43", note:"Alexandre Rechi (Whaleska) — R$ 14.000."},
-{date:"2026-08-03", closer:"Luana Melo", attended:1, closed:0, ts:"03/08 18:50", note:"Sem fechamento — Marcello(ind): filho autista com problema de saúde, mulher pediu para não fazer."},
-{date:"2026-08-04", closer:"Fabi Mazzoleni", attended:0, closed:0, ts:"04/08 17:55", note:"Sem atendimento nem fechamento."},
-{date:"2026-08-04", closer:"Tayany", attended:2, closed:2, ts:"04/08 18:00 (editada)", note:"Roberto Paixão — R$ 16.065. Jhonathan Geyson — R$ 6.000 (tratamento). TM R$ 11.032,50."},
-{date:"2026-08-04", closer:"Luana Melo", attended:3, closed:3, ts:"04/08 18:17 (editada)", note:"Fechou 2 + 1 tratamento: Ayron (Fabi) R$ 13.200, Ewerton Thiago (Joyce) R$ 13.900, Wellison (Waleska) R$ 6.000 (tratamento). Maristela (ind): alopecia frontal fibrosante, orientada a buscar laudo com tricologista. José Jr (Waleska): vetado por alergia a lidocaína. TM R$ 13.550."},
-{date:"2026-08-04", closer:"AssucenaTomaz", attended:3, closed:1, ts:"04/08 18:47", note:"Marcos (Luana) fechado — R$ 15.000. Neidimar (Luana): vai conversar com a esposa, que tem o cartão. Kauan (Luana): buscando melhor valor até R$ 10 mil. TM R$ 15.000."},
-{date:"2026-08-04", closer:"João Pedro Closer Capi Hair", attended:6, closed:3, ts:"04/08 19:06 (editada)", note:"Diego (JP) fechado R$ 16.900, Wagner (JP) fechado R$ 22.000, Thiago (JP) fechado R$ 22.000. Fábio (Fabi): volta aos EUA, só decide ano que vem. João Marcos (JP): mãe tentando novo cartão até quinta. Pedro Paulo (JP): vetado, aguardando liberação do neuro pós-AVC. Rodrigo Massom (Fabi): só fecha se conseguir antecipar férias na empresa. TM R$ 20.300. Resolve parcialmente a pendência de relatórios ausentes de João Pedro (04/08 encontrado; 01/08 e 03/08 seguem sem relatório)."}
+{date:"2026-08-01", closer:"Fabi Mazzoleni", attended:1, closed:1, closedTransplante:1, ts:"01/08 11:49", note:"Rubens (Jordana) — R$ 13.900"},
+{date:"2026-08-01", closer:"Luana Melo", attended:2, closed:1, closedTransplante:1, ts:"01/08 12:09", note:"José Antônio (Waleska) — R$ 13.990. Maurício (Waleska) sem dinheiro."},
+{date:"2026-08-01", closer:"Tayany", attended:1, closed:0, closedTransplante:0, ts:"01/08 12:43", note:"Sem fechamento — Paulo Roberto (Whaleska): pagamento do sinal só na segunda-feira (03/08)."},
+{date:"2026-08-03", closer:"Fabi Mazzoleni", attended:0, closed:0, closedTransplante:0, ts:"03/08 18:27", note:"Sem atendimento nem fechamento."},
+{date:"2026-08-03", closer:"AssucenaTomaz", attended:2, closed:1, closedTransplante:1, ts:"03/08 18:40 (editada)", note:"Maicon (Assucena) — R$ 25.000. Tratamento 1 (Luana): vai pagar 10/08. Marlon (Luana): achou caro, buscando outros orçamentos."},
+{date:"2026-08-03", closer:"Tayany", attended:1, closed:1, closedTransplante:1, ts:"03/08 18:43", note:"Alexandre Rechi (Whaleska) — R$ 14.000."},
+{date:"2026-08-03", closer:"Luana Melo", attended:1, closed:0, closedTransplante:0, ts:"03/08 18:50", note:"Sem fechamento — Marcello(ind): filho autista com problema de saúde, mulher pediu para não fazer."},
+{date:"2026-08-04", closer:"Fabi Mazzoleni", attended:0, closed:0, closedTransplante:0, ts:"04/08 17:55", note:"Sem atendimento nem fechamento."},
+{date:"2026-08-04", closer:"Tayany", attended:2, closed:2, closedTransplante:1, ts:"04/08 18:00 (editada)", note:"Roberto Paixão — R$ 16.065 (transplante). Jhonathan Geyson — R$ 6.000 (tratamento, não contabilizado em Volume de Vendas). TM R$ 11.032,50."},
+{date:"2026-08-04", closer:"Luana Melo", attended:3, closed:3, closedTransplante:2, ts:"04/08 18:17 (editada)", note:"Fechou 2 transplantes + 1 tratamento: Ayron (Fabi) R$ 13.200, Ewerton Thiago (Joyce) R$ 13.900 (ambos transplante). Wellison (Waleska) R$ 6.000 (tratamento, não contabilizado em Volume de Vendas). Maristela (ind): alopecia frontal fibrosante, orientada a buscar laudo com tricologista. José Jr (Waleska): vetado por alergia a lidocaína. TM R$ 13.550."},
+{date:"2026-08-04", closer:"AssucenaTomaz", attended:3, closed:1, closedTransplante:1, ts:"04/08 18:47", note:"Marcos (Luana) fechado — R$ 15.000 (transplante). Neidimar (Luana): vai conversar com a esposa, que tem o cartão. Kauan (Luana): buscando melhor valor até R$ 10 mil. TM R$ 15.000."},
+{date:"2026-08-04", closer:"João Pedro Closer Capi Hair", attended:6, closed:3, closedTransplante:3, ts:"04/08 19:06 (editada)", note:"Diego (JP) fechado R$ 16.900, Wagner (JP) fechado R$ 22.000, Thiago (JP) fechado R$ 22.000 (os 3 transplante). Fábio (Fabi): volta aos EUA, só decide ano que vem. João Marcos (JP): mãe tentando novo cartão até quinta. Pedro Paulo (JP): vetado, aguardando liberação do neuro pós-AVC. Rodrigo Massom (Fabi): só fecha se conseguir antecipar férias na empresa. TM R$ 20.300. Resolve parcialmente a pendência de relatórios ausentes de João Pedro (04/08 encontrado; 01/08 e 03/08 seguem sem relatório)."}
 ];
 // Observação: nenhum relatório de João Pedro foi encontrado no grupo Closeres em 01/08 e 03/08 (releitura do histórico completo do
 // grupo desde 31/07); Botafogo nesses dois dias considera apenas o fechamento relatado por Assucena. Em 04/08 o relatório de João
 // Pedro foi encontrado normalmente (19:06, editado) e já está registrado abaixo. 02/08 (domingo) sem nenhum relatório de nenhum
 // closer — considerado dia sem expediente comercial, célula omitida do heatmap (mesmo critério já usado nos heatmaps de cirurgias).
+// A partir de 05/08/2026, a pedido de Karina, a aba Volume de Vendas conta somente vendas de transplante capilar (campo
+// closedTransplante) — vendas de tratamento (ex.: Jhonathan Geyson 04/08, Wellison 04/08) ficam registradas no relatório para
+// histórico/auditoria, mas não contam mais para a meta diária, o heatmap, os KPIs nem os gráficos.
 
 function computeSalesDaily(){
   const byDate = {};
   salesReports.forEach(r=>{
     const branch = CLOSER_BRANCH[r.closer] || "Outro";
     if(!byDate[r.date]) byDate[r.date] = {branches:{Botafogo:0,Barra:0,"Goiânia":0}, reports:[]};
-    byDate[r.date].branches[branch] = (byDate[r.date].branches[branch]||0) + r.closed;
+    byDate[r.date].branches[branch] = (byDate[r.date].branches[branch]||0) + r.closedTransplante;
     byDate[r.date].reports.push(r);
   });
   return byDate;
@@ -662,7 +668,8 @@ const history = [
 {ts:"04/08 18:40",author:"AssucenaTomaz",type:"Cancelamento (Agosto)",msg:"Repostagem completa integral de 18:40 seguida da legenda curta 'Retirado paciente de amanhã, teve mudança no trabalho e pediu para remarcar'. Comparação dia a dia (01/08 a 31/08) contra o array surgeriesAgosto encontrou exatamente uma diferença: dia 05/08 deixou de mostrar Rafael Neustad (10k, A), permanecendo apenas Leonardo Vieira. Paciente identificado por eliminação (a mensagem não citava nome). Como nenhuma nova data foi informada, o registro foi marcado como Cancelado (não Reagendado) — se uma nova data for confirmada em execução futura, o registro deve ser atualizado para Reagendado com o campo date corrigido."},
 {ts:"05/08 08:15",author:"Sistema (verificação automática)",type:"Verificação concluída",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — 1 mensagem nova (repostagem completa + legenda) desde 04/08 12:00 processada: repostagem de 18:40 (AssucenaTomaz, 'Retirado paciente de amanhã, teve mudança no trabalho e pediu para remarcar'), resultando no cancelamento de Rafael Neustad (05/08), aplicado acima. Grupo 'Closeres' relido com sucesso — 5 relatórios novos desde 03/08 18:50 processados, todos de 04/08: Fabi Mazzoleni (17:55, 0/0), Tayany (18:00, editado, 2/2 — Roberto Paixão e Jhonathan Geyson), Luana Melo (18:17, editado, 3/3 — Ayron, Ewerton Thiago e Wellison/tratamento), AssucenaTomaz (18:47, 3/1 — Marcos 15k) e João Pedro Closer Capi Hair (19:06, editado, 6/3 — Diego, Wagner e Thiago, TM R$20.300), todos aplicados acima. O relatório de João Pedro em 04/08 resolve parcialmente a pendência aberta em 04/08 (relatórios ausentes em 01/08 e 03/08 seguem pendentes). Mensagem de hoje (05/08 08:00, Vanessa Abreu CEO, 'Closers bom dia!!!! Quantas indicações vcs pegaram ontem?') é apenas cobrança de relatórios, sem dado de venda — sem relatórios de closers ainda nesta execução."},
 {ts:"05/08 09:39",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto) / Pendência (Vendas)",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' relido com sucesso — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido com sucesso — última mensagem continua sendo a de 04/08 18:40 (AssucenaTomaz, 'Retirado paciente de amanhã...'), já registrada e já processada (cancelamento de Rafael Neustad); sem mensagens novas em nenhum dos dois grupos de agenda. Grupo 'Closeres' relido com sucesso — após a cobrança de 05/08 08:00 (Vanessa Abreu CEO, 'Quantas indicações vcs pegaram ontem?'), quatro closers responderam apenas com um número solto de 'indicações', sem o formato usual de relatório diário (Atendimento/Fechamento): Tayany Assunção (09:27, '1 Indicação durante a avaliação do Jhonathan'), AssucenaTomaz (09:27, '7'), João Pedro Closer Capi Hair (09:31, '4') e Luana Melo (09:36, '4'). Fabi Mazzoleni não respondeu até o momento. Como 'indicação' (lead/referência) não corresponde claramente a 'atendido' nem a 'fechado' do schema de salesReports, e nenhuma dessas mensagens trouxe a estrutura padrão de relatório diário, NENHUM dado foi lançado em salesReports nesta execução — pendência registrada, ver footer-note. Se Karina confirmar que esses números devem ser tratados como fechamentos (ou atendimentos) do dia, ou se um relatório diário formal chegar depois, os dados podem ser lançados em execução futura."},
-{ts:"05/08 10:06",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto + Closeres)",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' reverificado — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado — última mensagem continua sendo a de 04/08 18:40 (AssucenaTomaz, 'Retirado paciente de amanhã...'), já registrada e já processada; sem mensagens novas. Grupo 'Closeres' reverificado — última mensagem continua sendo a de 05/08 09:36 (Luana Melo, '4', resposta à cobrança de indicações de Vanessa), já registrada; pendência sobre os números soltos de 'indicações' (Tayany, Assucena, João Pedro, Luana) permanece em aberto, Fabi Mazzoleni segue sem responder. Nenhuma mensagem nova em nenhum dos três grupos desde a última execução (09:39)."}
+{ts:"05/08 10:06",author:"Sistema (verificação automática)",type:"Verificação sem novidades (Julho + Agosto + Closeres)",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO JULHO' reverificado — última mensagem continua sendo a de 29/07 17:51 (AssucenaTomaz, 'Editando valor na agenda'), já registrada; sem mensagens novas. Grupo 'AGENDA TC BOTAFOGO AGOSTO' reverificado — última mensagem continua sendo a de 04/08 18:40 (AssucenaTomaz, 'Retirado paciente de amanhã...'), já registrada e já processada; sem mensagens novas. Grupo 'Closeres' reverificado — última mensagem continua sendo a de 05/08 09:36 (Luana Melo, '4', resposta à cobrança de indicações de Vanessa), já registrada; pendência sobre os números soltos de 'indicações' (Tayany, Assucena, João Pedro, Luana) permanece em aberto, Fabi Mazzoleni segue sem responder. Nenhuma mensagem nova em nenhum dos três grupos desde a última execução (09:39)."},
+{ts:"05/08 11:12",author:"Sistema (a pedido de Karina)",type:"Correção — Volume de Vendas (só transplante)",msg:"A pedido de Karina: a aba 'Volume de Vendas' passou a contabilizar somente vendas de transplante capilar, excluindo vendas de tratamento. Adicionado o campo `closedTransplante` a cada objeto de `salesReports` (contagem de fechamentos que são efetivamente transplante, separada do campo `closed` original que soma transplante+tratamento e foi mantido apenas para auditoria/histórico). Revisão de todos os 12 relatórios já lançados identificou 2 relatórios mistos, corrigidos retroativamente: Tayany 04/08 (closed:2 → closedTransplante:1, pois Jhonathan Geyson R$ 6.000 era tratamento) e Luana Melo 04/08 (closed:3 → closedTransplante:2, pois Wellison R$ 6.000 era tratamento); os demais 10 relatórios já eram 100% transplante e ficaram com closedTransplante igual ao closed original. `computeSalesDaily()`, os KPIs (Total/Botafogo/Barra/Goiânia), o heatmap, a tabela de detalhamento e os gráficos (por closer, por filial, evolução diária) passaram a usar `closedTransplante`. Totais recalculados (validado via Node antes de publicar): mês passa de 13 para 11 vendas válidas (Botafogo 5, Barra 1, Goiânia 5, sem mudança em Botafogo/Barra); dia 04/08 passa de 9 para 7 vendas no heatmap (Goiânia cai de 5 para 3 pela exclusão dos 2 tratamentos), mas o status do dia continua amarelo tanto antes quanto depois — Barra (Fabi, 0 atendimentos em 04/08) já era a filial que impedia a meta batida nos dois cálculos, então não houve mudança de cor nesse dia específico. Labels da aba atualizadas para deixar claro que o número é só transplante ('Transplantes fechados', 'Total transplantes no mês', 'Transplantes Botafogo/Barra/Goiânia'). A automação agendada (a cada 2h) também foi atualizada para já separar transplante de tratamento ao lançar novos relatórios daqui em diante."}
 ];
 
 // Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
@@ -1071,17 +1078,17 @@ function renderVendasKPIs(){
   });
   salesReports.forEach(r=>{
     const branch = CLOSER_BRANCH[r.closer] || "Outro";
-    branchTotals[branch] = (branchTotals[branch]||0) + r.closed;
-    totalMonth += r.closed;
+    branchTotals[branch] = (branchTotals[branch]||0) + r.closedTransplante;
+    totalMonth += r.closedTransplante;
   });
   const kpis = [
     {v:green, l:"Dias com meta batida", c:"green"},
     {v:yellow, l:"Dias parciais", c:"yellow"},
     {v:red, l:"Dias sem vendas", c:"red"},
-    {v:totalMonth, l:"Total vendas no mês", c:"blue"},
-    {v:branchTotals.Botafogo, l:"Vendas Botafogo", c:"purple"},
-    {v:branchTotals.Barra, l:"Vendas Barra", c:"purple"},
-    {v:branchTotals["Goiânia"], l:"Vendas Goiânia", c:"purple"}
+    {v:totalMonth, l:"Total transplantes no mês", c:"blue"},
+    {v:branchTotals.Botafogo, l:"Transplantes Botafogo", c:"purple"},
+    {v:branchTotals.Barra, l:"Transplantes Barra", c:"purple"},
+    {v:branchTotals["Goiânia"], l:"Transplantes Goiânia", c:"purple"}
   ];
   document.getElementById('vendasKpiRow').innerHTML = kpis.map(k=>`<div class="kpi c-${k.c}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
 }
@@ -1166,13 +1173,13 @@ function renderVendasCharts(){
   const palette = ['#4f46e5','#22c55e','#eab308','#ef4444','#a855f7'];
 
   const byCloser = {};
-  salesReports.forEach(r=>{ byCloser[r.closer] = (byCloser[r.closer]||0) + r.closed; });
+  salesReports.forEach(r=>{ byCloser[r.closer] = (byCloser[r.closer]||0) + r.closedTransplante; });
   chartRefs.closer = new Chart(document.getElementById('chartCloser'), {type:'bar',
-    data:{labels:Object.keys(byCloser),datasets:[{label:'Vendas fechadas',data:Object.values(byCloser),backgroundColor:'#4f46e5',borderRadius:4}]},
+    data:{labels:Object.keys(byCloser),datasets:[{label:'Transplantes fechados',data:Object.values(byCloser),backgroundColor:'#4f46e5',borderRadius:4}]},
     options:baseOpts(false)});
 
   const byBranch = {Botafogo:0,Barra:0,"Goiânia":0};
-  salesReports.forEach(r=>{ const b=CLOSER_BRANCH[r.closer]||"Outro"; byBranch[b]=(byBranch[b]||0)+r.closed; });
+  salesReports.forEach(r=>{ const b=CLOSER_BRANCH[r.closer]||"Outro"; byBranch[b]=(byBranch[b]||0)+r.closedTransplante; });
   chartRefs.filial = new Chart(document.getElementById('chartFilial'), {type:'doughnut',
     data:{labels:Object.keys(byBranch),datasets:[{data:Object.values(byBranch),backgroundColor:palette}]},
     options:baseOpts(true)});
@@ -1188,7 +1195,7 @@ function renderVendasCharts(){
   });
   chartRefs.vendasDia = new Chart(document.getElementById('chartVendasDia'), {
     data:{labels, datasets:[
-      {type:'bar', label:'Vendas fechadas', data:totals, backgroundColor:'#22c55e', borderRadius:4},
+      {type:'bar', label:'Transplantes fechados', data:totals, backgroundColor:'#22c55e', borderRadius:4},
       {type:'line', label:'Meta (5/dia)', data:metaLine, borderColor:'#ef4444', borderWidth:2, pointRadius:0, fill:false}
     ]},
     options:baseOpts(false)});
