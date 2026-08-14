@@ -110,6 +110,9 @@ body.authed #loginGate{display:none;}
 .heatmap-wrap{display:flex;flex-direction:column;gap:8px;max-width:none;}
 .heatmap-header{display:grid;grid-template-columns:78px repeat(6,1fr) 72px 100px;gap:8px;}
 .heatmap-header .hh{font-size:12px;font-weight:700;color:var(--text-2);text-align:center;text-transform:uppercase;letter-spacing:.03em;padding-bottom:2px;}
+.heatmap-header .hh.hh-cutoff{color:var(--accent);}
+.hh-cutoff .cutoff-badge{display:inline-flex;align-items:center;justify-content:center;margin-left:3px;font-size:9px;font-weight:800;background:var(--accent);color:#fff;border-radius:5px;padding:1px 4px;letter-spacing:0;text-transform:none;vertical-align:middle;}
+.heat-cell.cut-line{box-shadow:inset 3px 0 0 var(--accent);}
 .heatmap-row{display:grid;grid-template-columns:78px repeat(6,1fr) 72px 100px;gap:8px;padding:2px;border-radius:12px;}
 .week-occ{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60px;border-radius:10px;background:var(--panel-2);font-weight:800;font-size:15px;line-height:1.1;}
 .week-occ .pct-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;opacity:.85;margin-top:2px;}
@@ -1087,13 +1090,13 @@ function renderHeatmap(){
   const nextWeekIdx = currentWeekIdx>=0 ? currentWeekIdx+1 : -1;
 
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map((w,wi)=> wi===1 ? `<div class="hh hh-cutoff" title="Corte semanal da meta de ocupação: a virada de semana acontece toda terça-feira (não na segunda)">${w}<span class="cutoff-badge">CORTE</span></div>` : `<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
 
   let rowsHtml = '';
   const augustCounts2 = computeAugustCounts();
   weeks.forEach((weekCells,w)=>{
     let weekTotal = 0;
-    const dayCells = weekCells.map(c=>{
+    const dayCells = weekCells.map((c,ci)=>{
       if(c===null) return `<div class="heat-cell blank"></div>`;
       let count, key, dLabel, spillCls;
       if(c.spill){
@@ -1109,8 +1112,9 @@ function renderHeatmap(){
       }
       weekTotal += count;
       const cls = count>=3 ? 'h3' : count===2 ? 'h2' : count===1 ? 'h1' : 'h0';
+      const cutCls = ci===1 ? ' cut-line' : '';
       const titleDate = c.spill ? `${fmtDate(key)} (agosto)` : fmtDate(key);
-      return `<div class="heat-cell ${cls}${spillCls}" title="${titleDate}: ${count} cirurgia(s)"><span class="d">${dLabel}</span><span class="c">${count}</span></div>`;
+      return `<div class="heat-cell ${cls}${spillCls}${cutCls}" title="${titleDate}: ${count} cirurgia(s)"><span class="d">${dLabel}</span><span class="c">${count}</span></div>`;
     }).join('');
     let rowClass = 'heatmap-row';
     let tag = '';
@@ -1146,7 +1150,7 @@ function renderHeatmapAgosto(){
   const currentMonday = tuesdayAnchorMonday(ty, tm-1, td);
 
   const weekdayLabels = ['Seg','Ter','Qua','Qui','Sex','Sáb'];
-  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map(w=>`<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
+  let headerHtml = `<div class="heatmap-header"><div></div>${weekdayLabels.map((w,wi)=> wi===1 ? `<div class="hh hh-cutoff" title="Corte semanal da meta de ocupação: a virada de semana acontece toda terça-feira (não na segunda)">${w}<span class="cutoff-badge">CORTE</span></div>` : `<div class="hh">${w}</div>`).join('')}<div class="hh">Ocup.</div><div class="hh">Meta</div></div>`;
 
   let rowsHtml = '';
   weeks.forEach((weekCells,w)=>{
@@ -1159,8 +1163,9 @@ function renderHeatmapAgosto(){
       const count = augustCounts[key]||0;
       weekTotal += count;
       const cls = count>=3 ? 'h3' : count===2 ? 'h2' : count===1 ? 'h1' : 'h0';
+      const cutCls = i===1 ? ' cut-line' : '';
       const dLabel = new Date(2026,7,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      return `<div class="heat-cell ${cls}" title="${dLabel}: ${count} cirurgia(s)"><span class="d">${d}</span><span class="c">${count}</span></div>`;
+      return `<div class="heat-cell ${cls}${cutCls}" title="${dLabel}: ${count} cirurgia(s)"><span class="d">${d}</span><span class="c">${count}</span></div>`;
     }).join('');
     const pct = Math.round((weekTotal/18)*100);
     const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
