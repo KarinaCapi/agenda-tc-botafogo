@@ -278,7 +278,7 @@ tr:last-child td{border-bottom:none;}
           <div class="empty-note" style="font-size:13px;line-height:1.6;">
             <strong>O que muda automaticamente:</strong> assim que a data de hoje (TODAY) entrar em setembro/2026, a rotina de verificação passa a ler o grupo de WhatsApp "AGENDA TC BOTAFOGO SETEMBRO" (parando de verificar "AGENDA TC BOTAFOGO AGOSTO", que ficará congelado a partir daí, no mesmo padrão já aplicado a julho em 14/08/2026). Um novo array <code>surgeriesSetembro</code> e um heatmap de ocupação dedicado para setembro serão criados automaticamente na primeira execução de setembro, seguindo a mesma estrutura de agosto (metas de ocupação semanal com corte às terças-feiras).<br><br>
             <strong>Pendência que deve ser resolvida com a virada:</strong> o paciente de reparo <strong>Felipe Cimino</strong> (id 1027) está com status "Reagendado" e permanece fisicamente no dia 24/08 do array de agosto porque a mensagem original ("precisou remarcar para setembro devido trabalho") não trouxe uma data exata. Assim que Karina ou o grupo de setembro confirmarem o novo dia, o registro deverá ser movido para o array/mês correto — isso também corrige a contagem do heatmap de 24/08 de agosto, que hoje mostra 2 cirurgias ativas nesse dia (Felipe Cimino + Rodolpho Costa) por causa dessa pendência.<br><br>
-            <strong>Volume de Vendas:</strong> a meta diária (5 vendas/dia: 3 Botafogo + 1 Barra + 1 Goiânia) e o mapeamento closer → filial continuam os mesmos em setembro; o heatmap de vendas de setembro começa a ser populado normalmente a partir dos relatórios do grupo "Closeres" (que não muda na virada de mês, ao contrário dos grupos de agenda cirúrgica).
+            <strong>Volume de Vendas:</strong> a meta diária (6 vendas/dia: 3 Botafogo + 1 Barra + 2 Goiânia, meta de Goiânia alterada de 1 para 2 em 18/08/2026 a pedido de Karina) e o mapeamento closer → filial continuam os mesmos em setembro; o heatmap de vendas de setembro começa a ser populado normalmente a partir dos relatórios do grupo "Closeres" (que não muda na virada de mês, ao contrário dos grupos de agenda cirúrgica).
           </div>
         </div>
         <div class="panel">
@@ -323,7 +323,7 @@ tr:last-child td{border-bottom:none;}
 
       <div id="tab-vendas" style="display:none;">
         <div class="panel">
-          <div class="panel-head"><h3>Meta diária: 5 vendas (3 Botafogo · 1 Barra · 1 Goiânia)</h3></div>
+          <div class="panel-head"><h3>Meta diária: 6 vendas (3 Botafogo · 1 Barra · 2 Goiânia)</h3></div>
           <div class="kpis" id="vendasKpiRow" style="margin-bottom:0;"></div>
         </div>
         <div class="panel">
@@ -347,7 +347,7 @@ tr:last-child td{border-bottom:none;}
         <div class="charts-grid">
           <div class="chart-box"><h4>Vendas por closer (mês)</h4><canvas id="chartCloser"></canvas></div>
           <div class="chart-box"><h4>Vendas por filial (mês)</h4><canvas id="chartFilial"></canvas></div>
-          <div class="chart-box" style="grid-column:1/-1;"><h4>Evolução diária — vendas x meta (5/dia)</h4><canvas id="chartVendasDia"></canvas></div>
+          <div class="chart-box" style="grid-column:1/-1;"><h4>Evolução diária — vendas x meta (6/dia)</h4><canvas id="chartVendasDia"></canvas></div>
         </div>
         <div class="empty-note">Relatórios extraídos do grupo "Closeres" desde 01/08/2026. Mapeamento closer → filial: João Pedro e Assucena = Botafogo · Fabi = Barra · Tayany e Luana = Goiânia. Esta aba conta somente vendas de <strong>transplante capilar</strong> — vendas de tratamento (ex.: Jhonathan Geyson e Wellison em 04/08) ficam registradas no relatório para histórico, mas não entram na meta diária, no heatmap, nos KPIs nem nos gráficos. Nenhum relatório de João Pedro encontrado em 01/08 e 03/08 — Botafogo nesses dias considera só Assucena.</div>
       </div>
@@ -393,8 +393,8 @@ Verificado em 18/08/2026 (verificação automática): grupos "AGENDA TC BOTAFOGO
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "2026-08-18 (verificação automática): Agosto — novo paciente Fabio Campos Novaes incluído em 19/08 (id 1088); mensagem 'Retirado paciente do dia 24' (17/08 17:32, motivo 'casamento') registrada como pendência, pois diverge do motivo já registrado para Felipe Cimino (id 1027, 'trabalho') e o dia 24/08 já estava vazio nas duas reposts mais recentes. Setembro — novo paciente Wallace Barros incluído em 02/09 (id 1089, via edição da repostagem original de 10:40). Closeres — relatório de Tayany (17/08, Goiânia) sem fechamento (attended 1, closed 0). TODAY atualizado para 2026-08-18.";
-const LAST_UPDATE_TS = "18/08/2026 09:11"; // Exibido no topo do dashboard — somente data e hora (o texto completo acima fica só para auditoria/histórico)
+const LAST_UPDATE = "2026-08-18 09:56 (correção manual solicitada por Karina): meta diária de vendas da filial Goiânia alterada de 1 para 2 (BRANCH_GOALS e DAILY_SALES_GOAL atualizados, meta total 5→6/dia); textos fixos da aba Volume de Vendas atualizados. Verificação automática anterior (09:00): Agosto — novo paciente Fabio Campos Novaes incluído em 19/08 (id 1088); mensagem 'Retirado paciente do dia 24' (17/08 17:32, motivo 'casamento') registrada como pendência, pois diverge do motivo já registrado para Felipe Cimino (id 1027, 'trabalho') e o dia 24/08 já estava vazio nas duas reposts mais recentes. Setembro — novo paciente Wallace Barros incluído em 02/09 (id 1089, via edição da repostagem original de 10:40). Closeres — relatório de Tayany (17/08, Goiânia) sem fechamento (attended 1, closed 0). TODAY atualizado para 2026-08-18.";
+const LAST_UPDATE_TS = "18/08/2026 09:56"; // Exibido no topo do dashboard — somente data e hora (o texto completo acima fica só para auditoria/histórico)
 const TODAY = "2026-08-18";
 
 const surgeries = [
@@ -566,7 +566,7 @@ const allSurgeries = [...surgeries, ...surgeriesAgosto, ...surgeriesSetembro];
 // ---------------- VOLUME DE VENDAS (grupo WhatsApp "Closeres") ----------------
 // Cada closer envia um "relatório diário" (ou "Relatório") no grupo Closeres com "Quantos atenderam" / "Quantos fecharam".
 // "closed" = quantidade de vendas fechadas naquele relatório (não o valor em R$). Mapeamento closer → filial definido por Karina:
-// João Pedro e Assucena = Botafogo (meta 3/dia) · Fabi = Barra (meta 1/dia) · Tayany e Luana = Goiânia (meta 1/dia). Meta total: 5 vendas/dia.
+// João Pedro e Assucena = Botafogo (meta 3/dia) · Fabi = Barra (meta 1/dia) · Tayany e Luana = Goiânia (meta 2/dia, alterada de 1 para 2 em 18/08/2026 a pedido de Karina). Meta total: 6 vendas/dia.
 const CLOSER_BRANCH = {
   "João Pedro Closer Capi Hair": "Botafogo",
   "AssucenaTomaz": "Botafogo",
@@ -574,8 +574,8 @@ const CLOSER_BRANCH = {
   "Tayany": "Goiânia",
   "Luana Melo": "Goiânia"
 };
-const BRANCH_GOALS = {"Botafogo": 3, "Barra": 1, "Goiânia": 1};
-const DAILY_SALES_GOAL = 5;
+const BRANCH_GOALS = {"Botafogo": 3, "Barra": 1, "Goiânia": 2};
+const DAILY_SALES_GOAL = 6;
 
 // Campo `closed` = total de fechamentos do relatório (inclui transplante + tratamento), mantido para auditoria/histórico.
 // Campo `closedTransplante` = quantos desses fechamentos são efetivamente cirurgia de transplante capilar (exclui "tratamento"),
@@ -671,6 +671,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"18/08 09:56",author:"Sistema (correção manual solicitada por Karina)",type:"Ajuste — Meta diária de vendas (Goiânia)",msg:"Karina solicitou diretamente no chat alterar a meta diária de vendas da filial Goiânia de 1 para 2. Constante BRANCH_GOALS atualizada ('Goiânia': 1 → 2) e DAILY_SALES_GOAL atualizada (5 → 6, refletindo a nova soma 3 Botafogo + 1 Barra + 2 Goiânia). Todos os textos fixos da aba Volume de Vendas que citavam a meta antiga (painel 'Meta diária', título do gráfico de evolução diária, tooltip da meta semanal, legenda do gráfico, considerações de setembro) foram atualizados para refletir a nova meta. Funções computeSalesDaily()/salesDayStatus() já leem BRANCH_GOALS/DAILY_SALES_GOAL dinamicamente, sem necessidade de ajuste manual de código além das constantes. Nenhuma alteração em dados de cirurgia, vendas já lançadas ou closer→filial."},
 {ts:"18/08 09:00",author:"Sistema (verificação automática)",type:"Inclusão (Agosto); Inclusão (Setembro); Pendência — motivo divergente (dia 24/08); Vendas (Closeres)",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido desde a mensagem de 17/08 10:10 (mensagem apagada, último ponto processado): repostagem completa integral de 16:46 ('Pré operatorio Capi Hair Plus', +55 21 99052-6173) com legenda 'Incluindo cirurgia quarta-feira' (16:46), seguida de nova repostagem completa integral de 17:32 (Assucena Closer Capi Hair) com legenda 'Retirado paciente do dia 24' (17:32). Comparação dia a dia identificou 1 novo paciente no dia 19/08 (quarta-feira): Fabio Campos Novaes, 13.000 em 10x, equipe A/W — adicionado como id 1088; dia 19/08 passa de 2 para 3 cirurgias ativas (junto com José Roberto da Silva Agostinho, id 1059, e Thiago Alexandre, id 1073, já registrados). A legenda 'Retirado paciente do dia 24' não corresponde a nenhuma mudança visível: o dia 24/08 já aparecia vazio (3 vagas em branco) tanto na repostagem de 16:46 quanto na de 17:32, pois o único paciente que ali esteve (Felipe Cimino, id 1027, reparo sem custo) já havia sido remarcado para setembro em 14/08, por motivo de 'trabalho'. João Pedro perguntou 'Qual motivo?' às 18:54 e Assucena respondeu às 18:55 'Ele disse que tem um casamento e precisa remarcar' — motivo 'casamento' diverge do motivo 'trabalho' já registrado para Felipe Cimino. PENDÊNCIA registrada (sem alteração de dados): pode ser o mesmo evento sendo formalmente logado/reconfirmado hoje com um motivo diferente (ou trocado) do que foi registrado em 14/08, ou uma confusão da equipe entre pacientes distintos — aguardando esclarecimento de Karina; registro de Felipe Cimino (id 1027) mantido intacto. Grupo 'AGENDA TC SETEMBRO BOTAFOGO' relido desde a repostagem de 17/08 10:40 (último ponto processado): a mensagem original de 10:40 foi EDITADA posteriormente (marcada 'Editada' no WhatsApp) acrescentando 'Wallace Barros 12k em 12x (JP)' ao dia 02/09, confirmado pela legenda curta 'Dia 02 com 3' (16:19) — adicionado como id 1089; dia 02/09 passa de 2 para 3 cirurgias ativas (junto com Victor Leandro Ribeiro, id 1072, e Cristiano Cantes Gonçalves, id 1076, já registrados). Mensagem avulsa 'Cirurgia' (17/08 16:19, João Pedro Closer Capi Hair), sem contexto ou anexo identificável — nenhuma ação tomada, tratada como ruído. Grupo 'Closeres' relido desde 15/08 09:47 (AssucenaTomaz, último ponto processado): 1 relatório novo — Tayany Assunção (Goiânia), 'Relatório Tayany — Goiânia — 17/08/2026' (19:20): Atendimentos do dia: 1, Fechamentos (transplante): 0, Tratamentos fechados: 0, Vetados/Desqualificados: 0 — 2 vídeos sem conversão (Walteno, avaliando financeiro para operar em janeiro; Wellington, virá à clínica avaliar presencialmente e pagar integral em 29/08) e mais 1 vídeo (Ederaldo, organizando financeiro para operar na 2ª quinzena de dezembro); nenhum fechamento no dia, sem impacto na meta de Goiânia (que segue avaliada pelo total do período). Novo registro adicionado a salesReports (date: 2026-08-17). TODAY atualizado de 2026-08-17 para 2026-08-18; textos fixos 'Hoje'/'Amanhã' da barra lateral atualizados para 18/08 e 19/08. Checagem da aba Agenda/KPIs/heatmap: dia 19/08 (agosto) passa de 2 para 3 cirurgias ativas; dia 02/09 (setembro) passa de 2 para 3 cirurgias ativas — ambos conferidos visualmente antes da publicação. Pendências que permanecem em aberto: data exata de setembro para Felipe Cimino (id 1027), motivo divergente do dia 24/08 (nova, acima), relatório ambíguo de João Pedro (10/08 18:37), relatórios ausentes de João Pedro (01/08, 03/08 e 15/08)."},
 {ts:"17/08 16:19",author:"Sistema (verificação automática)",type:"Verificação sem novidades",msg:"Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido desde a repostagem/legenda de 15/08 09:22-09:23 (último ponto processado) — última mensagem do grupo continua sendo a de hoje 10:10 (João Pedro Closer Capi Hair, 'Mensagem apagada'), já processada em execuções anteriores; sem mensagens novas, nenhuma alteração em surgeriesAgosto. Grupo 'AGENDA TC SETEMBRO BOTAFOGO' relido — última mensagem continua sendo a repostagem completa integral de hoje 10:40 (João Pedro Closer Capi Hair), já processada na verificação de 15:32; sem mensagens novas, nenhuma alteração em surgeriesSetembro. Grupo 'Closeres' relido — última mensagem continua sendo o relatório de AssucenaTomaz de 15/08 09:47 ('Relatório Assucena 15/08/26'), já processado; sem relatórios novos, nenhuma alteração em salesReports. TODAY mantido em 2026-08-17; textos fixos Hoje/Amanhã já corretos (17/08 e 18/08). Nenhuma alteração em dados de cirurgia ou vendas nesta execução. Pendências que permanecem em aberto: data exata de setembro para Felipe Cimino (id 1027), relatório ambíguo de João Pedro (10/08 18:37), relatórios ausentes de João Pedro (01/08, 03/08 e 15/08). As duas pendências de setembro (Cristiano Cantes Gonçalves e Rodolpho da Costa Pestana) foram resolvidas na verificação anterior (16:13, confirmação de Karina) e não reabriram."},
 {ts:"17/08 16:13",author:"Sistema (confirmação direta de Karina no chat)",type:"Pendências resolvidas — Cristiano Cantes Gonçalves e Rodolpho da Costa Pestana",msg:"Karina confirmou diretamente no chat as duas pendências abertas na verificação anterior (17/08 15:32): (1) Cristiano Cantes Gonçalves (id 1076, 02/09/2026) é uma RESERVA NOVA, sem relação com o registro Cancelado de agosto (id 1051, 12/08/2026) — mantido como está, sem alteração de dados. (2) Rodolpho da Costa Pestana (id 1083, 18/09/2026) e Rodolpho Costa (id 1071, 24/08/2026, ainda Agendado) são PACIENTES DIFERENTES — ambos os registros permanecem ativos e separados, sem alteração de dados. Nenhuma mudança em datas/status/valores nesta execução, apenas atualização das obs dos dois registros e fechamento das pendências no histórico/footer-note."},
@@ -1379,7 +1380,7 @@ function renderVendasHeatmap(){
 
   let rowsHtml = '';
   weeks.forEach((weekCells,w)=>{
-    // Meta semanal = 5 vendas/dia × dias úteis (seg-sáb) da semana dentro de agosto (semanas parciais na virada do mês
+    // Meta semanal = 6 vendas/dia × dias úteis (seg-sáb) da semana dentro de agosto (semanas parciais na virada do mês
     // têm meta proporcional aos dias que de fato existem nessa semana — ex.: semana com só sábado 01/08 tem meta 5, não 30).
     let weekTotal = 0; // vendas já fechadas na semana (dias futuros contam 0 automaticamente, ainda sem dado)
     let weekBusinessDays = 0; // total de dias úteis da semana (passados + futuros), define a meta da semana
@@ -1408,7 +1409,7 @@ function renderVendasHeatmap(){
     if(weekTotal >= weekTarget){ metaCls='meta-hit'; metaSub='meta batida! 🎉'; }
     else if(weekConcluded){ metaCls='meta-miss'; metaSub='meta não batida'; }
     else { metaCls='meta-warn'; metaSub='em andamento'; }
-    const metaCell = `<div class="week-meta ${metaCls}" title="Meta da semana: ${weekTarget} vendas (5/dia × ${weekBusinessDays} dia(s) útil(eis))"><span class="meta-line">${weekTotal}/${weekTarget}</span><span class="meta-sub">${metaSub}</span></div>`;
+    const metaCell = `<div class="week-meta ${metaCls}" title="Meta da semana: ${weekTarget} vendas (6/dia × ${weekBusinessDays} dia(s) útil(eis))"><span class="meta-line">${weekTotal}/${weekTarget}</span><span class="meta-sub">${metaSub}</span></div>`;
     let rowClass = 'heatmap-row';
     let tag = '';
     if(w===currentWeekIdx){ rowClass += ' current-week'; tag = '<div class="tag">Atual</div>'; }
@@ -1462,7 +1463,7 @@ function renderVendasCharts(){
   chartRefs.vendasDia = new Chart(document.getElementById('chartVendasDia'), {
     data:{labels, datasets:[
       {type:'bar', label:'Transplantes fechados', data:totals, backgroundColor:'#22c55e', borderRadius:4},
-      {type:'line', label:'Meta (5/dia)', data:metaLine, borderColor:'#ef4444', borderWidth:2, pointRadius:0, fill:false}
+      {type:'line', label:'Meta (6/dia)', data:metaLine, borderColor:'#ef4444', borderWidth:2, pointRadius:0, fill:false}
     ]},
     options:baseOpts(false)});
 }
