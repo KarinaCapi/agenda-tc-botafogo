@@ -2391,6 +2391,7 @@ function renderCharts(){
 
 function renderConsolidado(){
   destroyCharts();
+  const palette = ['#4f46e5','#22c55e','#eab308','#ef4444','#a855f7','#3b82f6','#f97316','#14b8a6','#ec4899'];
   const combined = [...allSurgeries, ...allSurgeriesBarra, ...allSurgeriesGoiania];
   const months = uniq(combined.map(s=>s.date.slice(0,7))).sort();
   const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
