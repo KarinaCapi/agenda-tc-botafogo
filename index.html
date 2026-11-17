@@ -600,7 +600,7 @@ tr:last-child td{border-bottom:none;}
 
 // ---------------- DATA ----------------
 const LAST_UPDATE = "VERIFICAÇÃO em 17/11/2026 10:07 BRT (verificação automática agendada) — Closeres: 1 relatório retroativo de João Pedro (dia 16/11, enviado hoje às 09:23, 3min após o checkpoint anterior) adicionado a salesReports (1 fechamento transplante + 1 tratamento fechado; José/Bioestimulador e Wallace/jordana sem correspondência óbvia na agenda, pendência de correspondência registrada). Demais 3 fontes (Botafogo Novembro, Barra, Goiânia) sem mensagens novas desde o checkpoint anterior (17/11 09:20) — última mensagem de cada uma já estava refletida no array publicado. | AJUSTE em 16/11/2026 17:06 BRT — Painel de KPIs (Total de Cirurgias, Cancelamentos, Reagendamentos) ajustado para considerar somente o mês vigente de TODAY, em vez da soma de todos os meses; Cirurgias da Semana/Próxima Semana continuam como janelas dinâmicas de 7 dias relativas a TODAY. Filtro é automático e acompanha TODAY em toda verificação futura. | VERIFICAÇÃO em 16/11/2026 15:29 BRT (verificação automática agendada) — Botafogo Nov: Antônio Fernando Gouveia incluído dia 20/11 ('Incluindo dia 20'), Luciano Duque incluído dia 18/11 ('Quarta feira com 3', possível retorno do paciente cancelado id 1253 por febre); pendência registrada para Fabrício Caetano (id 1277) e Willian Oliveira (id 1295), ausentes do dia 21/11 nas repostagens mais recentes sem mensagem explícita. Barra Nov: Victor Hugo Ronque incluído e confirmado dia 27/11 ('Dia 27 ok'). Goiânia Dez: repostagem editada de Luana Melo (caption 'Alterando nomes em 01, 07, 09 e 14') trouxe 3 remanejamentos (Thyago/Thiago Soares da Silva 01→09/12, Francisco Fábio de S Nascimento 07→01/12) e 2 substituições (João Marcus Lourenço Terra novo no dia 07/12, Adriano Prudêncio de Oliveira novo no dia 14/12 no lugar de Silvio Siqueira Lisboa cancelado), além de confirmação (✅) de Jean Carlos Martins no dia 22/12; pendência registrada para José Gilmar Pires da Silva (id 3135, dia 29/12), ausente da repostagem mais recente (substituído por 'Sérgio Costa e Souza' sem mensagem explícita confirmando a troca). CORREÇÃO em 16/11/2026 13:14 BRT (verificação manual solicitada por Karina) — releitura cuidadosa do grupo Closeres: a verificação automática anterior (16/11/2026 12:41) havia capturado apenas os relatórios de João Pedro Closer Capi Hair e Assucena Closer Capi Hair para 13/11 e 14/11, deixando de fora os relatórios de Luana Melo (closer Goiânia) e Fabi Closer Capi Hair Barra para os mesmos dias — identificados agora via busca por 'Relatório' dentro do próprio chat do grupo Closeres. Adicionadas 4 entradas a salesReports: Luana Melo 13/11/26 (2 atendimentos, 1 fechamento transplante — Fellipe/indicação 15k, possível correspondência com id 3142 Fellipe Teixeira Lagares em surgeriesGoianiaDezembro, mesmo valor); Fabi Mazzoleni 13/11/26 (2 atendimentos, 1 fechamento — Jucyara/Joyce 13.900 em 12x sinal 6k); Luana Melo 14/11/26 (3 atendimentos, 3 fechamentos — Tarcísio/Waleska 25k, João Marcus/Waleska 18.900, Adriano/Waleska 17k); Fabi Mazzoleni 14/11/26 (2 atendimentos, 1 fechamento — Pablo 13.900 sinal 5k). Total de fechamentos agora contabilizados corretamente: 13/11 = 2 (Luana 1 + Fabi 1; João Pedro e Assucena não fecharam nenhuma venda neste dia), 14/11 = 5 (João Pedro 0 + Assucena 1 + Luana 3 + Fabi 1). Nenhuma alteração nos arrays de agenda (surgeries*) nesta correção — apenas em salesReports. Validação: sintaxe do bloco <script> conferida com new Function; closedTransplante <= closed conferido nas 4 novas entradas; nenhum id duplicado."
-const LAST_UPDATE_TS = "17/11/2026 11:55"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
+const LAST_UPDATE_TS = "17/11/2026 12:29"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
 
 const TODAY = "2026-11-17";
 
@@ -1562,6 +1562,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"17/11/2026 12:29",author:"Sistema (ajuste solicitado por Karina)",type:"correção",msg:"Consolidado Geral: redefinido o significado de \'Agendadas\' para total que estava agendado no mês (realizadas + pendentes futuras + reagendamentos + cancelamentos), conforme esclarecimento de Karina. Realizadas continua sendo apenas as que efetivamente aconteceram, sem contar reagendamentos/cancelamentos. Cards gerais e por unidade, tabela de resumo mensal e Gráfico 1 atualizados; Gráfico 4 renomeou a fatia \'Agendada (futura)\' para \'Pendente (futura)\' para evitar confusão com o novo sentido de Agendadas."},
 {ts:"17/11/2026 11:55",author:"Sistema (ajuste solicitado por Karina)",type:"correção",msg:"Consolidado Geral redesenhado para maior clareza: adicionados percentuais de reagendamento e cancelamento; títulos agora especificam \'realizadas\' x \'agendadas (futuras)\'; removidas colunas Confirmadas/Alta Prioridade e a métrica ambígua Vendas Fechadas (dados de vendas já ficam na aba Volume de Vendas); tabela de resumo mensal agora mostra Agendadas, Realizadas, Reagendamentos (+%) e Cancelamentos (+%); Gráfico 1 agora compara agendadas x realizadas por mês; Gráfico 3 passou a mostrar transplantes realizados por mês e por unidade (Botafogo/Barra/Goiânia); Gráfico 4 simplificado para Realizada/Agendada(futura)/Reagendada/Cancelada."},
 {ts:"17/11/2026 10:35",author:"Sistema (verificação automática agendada)",type:"correção de layout: Consolidado Geral fora do lugar (metade da tela) e indicador geral duplicado na aba Capi Hair",msg:"Correção em 17/11/2026 10:35 (BRT), a pedido da Karina, de dois problemas visuais introduzidos na reestruturação anterior (10:15): (1) a aba Consolidado Geral estava posicionada fora da área principal do painel (como irmã de .main dentro de .body-wrap), ocupando só metade da tela — movida para dentro de .main, como irmã das demais abas; (2) a aba Capi Hair estava mostrando o indicador geral (combinado das 3 unidades) em vez do indicador próprio de Botafogo — criado um indicador dedicado (kpiRowIndicadores) com dados só de Botafogo, e o indicador geral (#kpiRow) agora fica oculto nas abas Capi Hair, TG Barra, TG Goiânia e Consolidado Geral, aparecendo só na Agenda. Também foi criada uma nova variável allSurgeriesCombined (Botafogo+Barra+Goiânia) usada exclusivamente pelos filtros e indicadores da Agenda, sem alterar allSurgeries (que volta a representar só Botafogo, corrigindo também os gráficos e heatmaps da aba Capi Hair que haviam sido contaminados pelos dados das outras filiais). A aba Consolidado Geral foi ampliada: agora traz cards de indicadores isolados por filial, uma tabela de cirurgias por mês e por unidade, além da tabela e gráficos consolidados já existentes. Nenhum dado de cirurgia ou venda foi alterado."},
 {ts:"17/11/2026 10:15",author:"Sistema (verificação automática agendada)",type:"reestruturação do painel: abas reordenadas, Consolidado Geral criado, filtro de período na Agenda, indicadores duplicados removidos",msg:"Atualização em 17/11/2026 10:15 (BRT). Reestruturação do painel solicitada pela Karina: reordenadas as abas (Agenda, Capi Hair, TG Barra, TG Goiânia, Volume de Vendas, Consolidado Geral); aba Histórico ocultada do menu (painel mantido, sem botão de acesso); aba Agenda agora inclui cirurgias das três unidades (Botafogo, TG Barra, TG Goiânia) com filtro de período (data de/até) para consulta retroativa; removidos os indicadores gerais duplicados das abas TG Barra e TG Goiânia (mantidos apenas os indicadores da própria unidade); criada a aba Consolidado Geral com totais mensais de todas as unidades (cirurgias, confirmações, reagendamentos, cancelamentos, alta prioridade, vendas fechadas e transplantes) e gráficos interativos. Nenhuma alteração de dados de cirurgias ou vendas nesta atualização."},
@@ -2403,25 +2404,26 @@ function renderConsolidado(){
     {label:'TG Goiânia', arr: allSurgeriesGoiania}
   ];
 
+  // Agendadas = TOTAL que estava agendado no mês (realizadas + pendentes futuras + reagendadas + canceladas).
+  // Realizadas = das agendadas, as que efetivamente aconteceram (sem contar reagendamentos/cancelamentos).
   function metrics(arr, m){
     const byMonth = s => m ? (s.date.slice(0,7)===m) : true;
     const realizadas = arr.filter(s=>byMonth(s) && s.activeCount!==false && s.date<=TODAY).length;
     const futuras = arr.filter(s=>byMonth(s) && s.activeCount!==false && s.date>TODAY).length;
-    const agendadas = realizadas + futuras;
     const reagendadas = arr.filter(s=>byMonth(s) && s.status==='Reagendado').length;
     const canceladas = arr.filter(s=>byMonth(s) && s.status==='Cancelado').length;
-    const base = agendadas + reagendadas + canceladas;
-    const pctReag = base>0 ? (reagendadas/base*100) : 0;
-    const pctCancel = base>0 ? (canceladas/base*100) : 0;
-    return {realizadas, futuras, agendadas, reagendadas, canceladas, pctReag, pctCancel};
+    const agendadas = realizadas + futuras + reagendadas + canceladas;
+    const pctReag = agendadas>0 ? (reagendadas/agendadas*100) : 0;
+    const pctCancel = agendadas>0 ? (canceladas/agendadas*100) : 0;
+    return {realizadas, futuras, reagendadas, canceladas, agendadas, pctReag, pctCancel};
   }
 
   const totalGeral = metrics(combined);
   const kpiGeral = document.getElementById('kpiRowConsolidadoGeral');
   if(kpiGeral){
     kpiGeral.innerHTML =
-      '<div class="kpi c-green"><div class="v">'+totalGeral.realizadas+'</div><div class="l">Cirurgias realizadas (período)</div></div>'
-      + '<div class="kpi c-blue"><div class="v">'+totalGeral.futuras+'</div><div class="l">Agendadas (futuras)</div></div>'
+      '<div class="kpi c-ink"><div class="v">'+totalGeral.agendadas+'</div><div class="l">Agendadas (período)</div></div>'
+      + '<div class="kpi c-green"><div class="v">'+totalGeral.realizadas+'</div><div class="l">Cirurgias realizadas (período)</div></div>'
       + '<div class="kpi c-yellow"><div class="v">'+totalGeral.reagendadas+' <span style="font-size:.6em;opacity:.8;">('+totalGeral.pctReag.toFixed(1)+'%)</span></div><div class="l">Reagendamentos (período)</div></div>'
       + '<div class="kpi c-red"><div class="v">'+totalGeral.canceladas+' <span style="font-size:.6em;opacity:.8;">('+totalGeral.pctCancel.toFixed(1)+'%)</span></div><div class="l">Cancelamentos (período)</div></div>';
   }
@@ -2433,8 +2435,8 @@ function renderConsolidado(){
       return '<div style="margin-bottom:14px;">'
         + '<div style="font-weight:600;margin-bottom:6px;opacity:.85;">'+u.label+'</div>'
         + '<div class="kpis" style="grid-template-columns:repeat(4,1fr);">'
+        + '<div class="kpi c-ink"><div class="v">'+mt.agendadas+'</div><div class="l">Agendadas</div></div>'
         + '<div class="kpi c-green"><div class="v">'+mt.realizadas+'</div><div class="l">Realizadas</div></div>'
-        + '<div class="kpi c-blue"><div class="v">'+mt.futuras+'</div><div class="l">Agendadas (futuras)</div></div>'
         + '<div class="kpi c-yellow"><div class="v">'+mt.reagendadas+' ('+mt.pctReag.toFixed(1)+'%)</div><div class="l">Reagendamentos</div></div>'
         + '<div class="kpi c-red"><div class="v">'+mt.canceladas+' ('+mt.pctCancel.toFixed(1)+'%)</div><div class="l">Cancelamentos</div></div>'
         + '</div></div>';
@@ -2468,7 +2470,7 @@ function renderConsolidado(){
       data:{
         labels: months.map(monthLabel),
         datasets:[
-          {label:'Agendadas', data: rows.map(r=>r.agendadas), backgroundColor: palette[0]},
+          {label:'Agendadas (total)', data: rows.map(r=>r.agendadas), backgroundColor: palette[0]},
           {label:'Realizadas', data: rows.map(r=>r.realizadas), backgroundColor: palette[1]}
         ]
       },
@@ -2505,7 +2507,7 @@ function renderConsolidado(){
     chartRefs.consolidadoStatus = new Chart(ctx4, {
       type:'pie',
       data:{
-        labels:['Realizada','Agendada (futura)','Reagendada','Cancelada'],
+        labels:['Realizada','Pendente (futura)','Reagendada','Cancelada'],
         datasets:[{data:[totalGeral.realizadas, totalGeral.futuras, totalGeral.reagendadas, totalGeral.canceladas], backgroundColor:[palette[1], palette[0], palette[2], palette[3]]}]
       },
       options: baseOpts(true)
