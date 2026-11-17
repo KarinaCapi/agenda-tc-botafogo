@@ -249,10 +249,10 @@ tr:last-child td{border-bottom:none;}
       <div class="tabs">
         <div class="tab active" data-tab="agenda">Agenda</div>
         <div class="tab" data-tab="indicadores">Capi Hair</div>
-        <div class="tab" data-tab="vendas">Volume de Vendas</div>
-        <div class="tab" data-tab="historico">Histórico</div>
         <div class="tab" data-tab="barra">TG Barra</div>
         <div class="tab" data-tab="goiania">TG Goiânia</div>
+        <div class="tab" data-tab="vendas">Volume de Vendas</div>
+        <div class="tab" data-tab="consolidado">Consolidado Geral</div>
       </div>
 
       <div id="tab-agenda">
@@ -262,6 +262,9 @@ tr:last-child td{border-bottom:none;}
             <select id="fStaff"><option value="">Médico/Equipe (todos)</option></select>
             <select id="fStatus"><option value="">Status (todos)</option></select>
             <select id="fProc"><option value="">Procedimento (todos)</option></select>
+            <input type="date" id="fDateFrom" title="Período de">
+            <input type="date" id="fDateTo" title="Período até">
+            <button class="btn icon" id="fDateClear" title="Limpar filtro de período">✕ Período</button>
             <div class="view-toggle" id="viewToggle">
               <button data-v="dia" class="">Dia</button>
               <button data-v="semana" class="">Semana</button>
@@ -532,6 +535,20 @@ tr:last-child td{border-bottom:none;}
         </div>
       </div>
     </div>
+      <div id="tab-consolidado" style="display:none;">
+        <div class="panel">
+          <h3 style="margin:0 0 12px 0;">Consolidado Geral — todos os meses, todas as unidades</h3>
+          <table>
+            <thead><tr><th>Mês</th><th>Cirurgias</th><th>Confirmadas</th><th>Agendadas</th><th>Reagendamentos</th><th>Cancelamentos</th><th>Alta Prioridade</th><th>Vendas Fechadas</th><th>Transplantes Fechados</th></tr></thead>
+            <tbody id="consolidadoTableBody"></tbody>
+          </table>
+          <div class="charts-grid">
+            <div class="chart-box"><h4>Cirurgias por mês (todas as unidades)</h4><canvas id="chartConsolidadoMes"></canvas></div>
+            <div class="chart-box"><h4>Vendas fechadas por mês</h4><canvas id="chartConsolidadoVendas"></canvas></div>
+            <div class="chart-box"><h4>Distribuição de status (período total)</h4><canvas id="chartConsolidadoStatus"></canvas></div>
+          </div>
+        </div>
+      </div>
   </div>
 </div>
 
@@ -560,7 +577,7 @@ tr:last-child td{border-bottom:none;}
 
 // ---------------- DATA ----------------
 const LAST_UPDATE = "VERIFICAÇÃO em 17/11/2026 10:07 BRT (verificação automática agendada) — Closeres: 1 relatório retroativo de João Pedro (dia 16/11, enviado hoje às 09:23, 3min após o checkpoint anterior) adicionado a salesReports (1 fechamento transplante + 1 tratamento fechado; José/Bioestimulador e Wallace/jordana sem correspondência óbvia na agenda, pendência de correspondência registrada). Demais 3 fontes (Botafogo Novembro, Barra, Goiânia) sem mensagens novas desde o checkpoint anterior (17/11 09:20) — última mensagem de cada uma já estava refletida no array publicado. | AJUSTE em 16/11/2026 17:06 BRT — Painel de KPIs (Total de Cirurgias, Cancelamentos, Reagendamentos) ajustado para considerar somente o mês vigente de TODAY, em vez da soma de todos os meses; Cirurgias da Semana/Próxima Semana continuam como janelas dinâmicas de 7 dias relativas a TODAY. Filtro é automático e acompanha TODAY em toda verificação futura. | VERIFICAÇÃO em 16/11/2026 15:29 BRT (verificação automática agendada) — Botafogo Nov: Antônio Fernando Gouveia incluído dia 20/11 ('Incluindo dia 20'), Luciano Duque incluído dia 18/11 ('Quarta feira com 3', possível retorno do paciente cancelado id 1253 por febre); pendência registrada para Fabrício Caetano (id 1277) e Willian Oliveira (id 1295), ausentes do dia 21/11 nas repostagens mais recentes sem mensagem explícita. Barra Nov: Victor Hugo Ronque incluído e confirmado dia 27/11 ('Dia 27 ok'). Goiânia Dez: repostagem editada de Luana Melo (caption 'Alterando nomes em 01, 07, 09 e 14') trouxe 3 remanejamentos (Thyago/Thiago Soares da Silva 01→09/12, Francisco Fábio de S Nascimento 07→01/12) e 2 substituições (João Marcus Lourenço Terra novo no dia 07/12, Adriano Prudêncio de Oliveira novo no dia 14/12 no lugar de Silvio Siqueira Lisboa cancelado), além de confirmação (✅) de Jean Carlos Martins no dia 22/12; pendência registrada para José Gilmar Pires da Silva (id 3135, dia 29/12), ausente da repostagem mais recente (substituído por 'Sérgio Costa e Souza' sem mensagem explícita confirmando a troca). CORREÇÃO em 16/11/2026 13:14 BRT (verificação manual solicitada por Karina) — releitura cuidadosa do grupo Closeres: a verificação automática anterior (16/11/2026 12:41) havia capturado apenas os relatórios de João Pedro Closer Capi Hair e Assucena Closer Capi Hair para 13/11 e 14/11, deixando de fora os relatórios de Luana Melo (closer Goiânia) e Fabi Closer Capi Hair Barra para os mesmos dias — identificados agora via busca por 'Relatório' dentro do próprio chat do grupo Closeres. Adicionadas 4 entradas a salesReports: Luana Melo 13/11/26 (2 atendimentos, 1 fechamento transplante — Fellipe/indicação 15k, possível correspondência com id 3142 Fellipe Teixeira Lagares em surgeriesGoianiaDezembro, mesmo valor); Fabi Mazzoleni 13/11/26 (2 atendimentos, 1 fechamento — Jucyara/Joyce 13.900 em 12x sinal 6k); Luana Melo 14/11/26 (3 atendimentos, 3 fechamentos — Tarcísio/Waleska 25k, João Marcus/Waleska 18.900, Adriano/Waleska 17k); Fabi Mazzoleni 14/11/26 (2 atendimentos, 1 fechamento — Pablo 13.900 sinal 5k). Total de fechamentos agora contabilizados corretamente: 13/11 = 2 (Luana 1 + Fabi 1; João Pedro e Assucena não fecharam nenhuma venda neste dia), 14/11 = 5 (João Pedro 0 + Assucena 1 + Luana 3 + Fabi 1). Nenhuma alteração nos arrays de agenda (surgeries*) nesta correção — apenas em salesReports. Validação: sintaxe do bloco <script> conferida com new Function; closedTransplante <= closed conferido nas 4 novas entradas; nenhum id duplicado."
-const LAST_UPDATE_TS = "17/11/2026 10:07"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
+const LAST_UPDATE_TS = "17/11/2026 10:15"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
 
 const TODAY = "2026-11-17";
 
@@ -1159,6 +1176,7 @@ const surgeriesGoianiaDezembro = [
 {"date":"2026-12-30","hospital":"Capi Hair TG Goiânia","id":3136,"obs":"Leitura antecipada de Dezembro (TODAY ainda em Novembro/2026) — grupo 'AGENDA TC GOIÂNIA', repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje (09/11/2026) 13:09, confirmada pela mensagem curta da mesma autora, mesmo horário (13:11): 'Agenda de Dezembro fechada'. Dia 30/12: '30-Paulo Ribeiro Jr 13.900 em 6X(Lu)(W)'. Sem marcação de ✅ — mantido Agendado.","patient":"Paulo Ribeiro Jr","payment":"6x","procedure":"Transplante Capilar","staff":["Lu","W"],"status":"Agendado","value":13900}
 ,{"date":"2026-12-07","hospital":"Capi Hair TG Goiânia","id":3140,"obs":"Novo paciente incluído em 11/11/2026 (verificação automática agendada) — repostagem completa integral do grupo 'AGENDA TC GOIÂNIA' de Luana Melo de ontem (10/11/2026) 17:41 (editada) traz pela primeira vez '7-Francisco Fábio de S Nascimento 13.900 (Lu)(W)' no dia 07/12 (antes vazio na repostagem anterior de 'Pré operatorio Capi Hair Plus' do mesmo dia 14:28); confirmado pela mensagem curta da mesma autora, mesmo horário (17:41): 'Incluindo cirurgia 07/12'. CORRESPONDÊNCIA CONFIRMADA com relatório de vendas 'Relatório Luana GO 10/11/26' (grupo Closeres, ~17:53): 'Francisco Fábio (Waleska) fechado 13.900' — mesmo nome e valor, fechado pela closer Luana Melo (código de equipe 'Lu') em parceria com a SDR/closer Waleska (código 'W'). Sem marcação de ✅ — mantido Agendado. REAGENDADO em 16/11/2026 (verificação automática agendada): repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08 (caption 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga'), traz no dia 07/12 um novo paciente (João Marcus Lourenço Terra, ver novo id 3145) no lugar de Francisco Fábio de S Nascimento, que passa a aparecer no dia 01/12 (ver novo id 3144, antes ocupado por Thyago Soares da Silva id 3141, remanejado para 09/12). Mesmo nome e valor (13.900) confirmam tratar-se do mesmo paciente remanejado, não um novo paciente. Registro mantido em 07/12 apenas para auditoria.","patient":"Francisco Fábio de S Nascimento","payment":"","procedure":"Transplante Capilar","staff":["Lu","W"],"status":"Reagendado","value":13900,"activeCount":false},{id:3141,date:"2026-12-01",patient:"Thyago Soares da Silva",value:13900,payment:"5x",staff:["Lu","W"],procedure:"Transplante Capilar",hospital:"Capi Hair TG Goiânia",status:"Reagendado",activeCount:false,obs:"Novo paciente incluído em 12/11/2026 (verificação automática agendada) — repostagem completa integral do grupo 'AGENDA TC GOIÂNIA' de Luana Melo de 11/11/2026 10:42 traz pela primeira vez '1-Thyago Soares da Silva 13.900 em 5X (Lu)(W)' no dia 01/12 (antes vazio); confirmado pela mensagem curta da mesma autora, mesmo horário (10:42): 'Incluindo cirurgia 01/12'. CORRESPONDÊNCIA CONFIRMADA com relatório de vendas 'Relatório Luana GO 11/11/26' (grupo Closeres, 21:33): 'Thyago (Waleska) Fechado 13.900' — mesmo nome e valor, fechado pela closer Luana Melo (código 'Lu') em parceria com Waleska (código 'W'). Sem marcação de ✅ — mantido Agendado. REAGENDADO em 16/11/2026 (verificação automática agendada): repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08 (caption 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga'), traz no dia 01/12 o paciente Francisco Fábio de S Nascimento (ver id 3140/3144) no lugar de Thyago Soares da Silva, que passa a aparecer no dia 09/12 com marcação \"Pg\"+✅ (ver novo id 3143, grafia 'Thiago' na nova mensagem). Mesmo valor (13.900) e forma de pagamento (5x) confirmam tratar-se do mesmo paciente remanejado, agora Confirmado. Registro mantido em 01/12 apenas para auditoria."},{id:3143,date:"2026-12-09",patient:"Thiago Soares da Silva",value:13900,payment:"5x",staff:["Lu","W"],procedure:"Transplante Capilar",hospital:"Capi Hair TG Goiânia",status:"Confirmado",obs:"Paciente remanejado em 16/11/2026 (verificação automática agendada) do dia 01/12 (id 3141, Agendado, grafia 'Thyago') para o dia 09/12 — repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08 (caption 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga'), traz '9-Thiago Soares da Silva 13.900 em 5X (Lu)(W) Pg' com ✅. Mesmo valor e forma de pagamento (13.900, 5x) do registro anterior confirmam ser o mesmo paciente. Marcação \"Pg\"+✅ presente — status Confirmado."},{id:3144,date:"2026-12-01",patient:"Francisco Fábio de S Nascimento",value:13900,payment:"",staff:["Lu","W"],procedure:"Transplante Capilar",hospital:"Capi Hair TG Goiânia",status:"Agendado",obs:"Paciente remanejado em 16/11/2026 (verificação automática agendada) do dia 07/12 (id 3140, Agendado) para o dia 01/12 — repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08 (caption 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga'), traz '1-Francisco Fábio de S. Nascimento 13.900 (Lu)(W)' sem marcação de ✅ ou \"Pg\". Mesmo valor (13.900) e equipe (Lu/W) do registro anterior confirmam ser o mesmo paciente. Mantido Agendado."},{id:3145,date:"2026-12-07",patient:"João Marcus Lourenço Terra",value:18900,payment:"12x",staff:["Lu","W"],procedure:"Transplante Capilar",hospital:"Capi Hair TG Goiânia",status:"Confirmado",obs:"Novo paciente incluído em 16/11/2026 (verificação automática agendada) — repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08 (caption 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga'), traz pela primeira vez '7-João Marcus Lourenço Terra 18.900 em 12X (Lu)(W) Pg' com ✅ no dia 07/12 (antes ocupado por Francisco Fábio de S Nascimento, remanejado para 01/12, ver id 3140/3144). Marcação \"Pg\"+✅ presente — status Confirmado."},{id:3146,date:"2026-12-14",patient:"Adriano Prudêncio de Oliveira",value:17000,payment:"pix",staff:["Lu","W"],procedure:"Transplante Capilar",hospital:"Capi Hair TG Goiânia",status:"Confirmado",obs:"Novo paciente incluído em 16/11/2026 (verificação automática agendada) — repostagem completa integral 'DEZEMBRO 2026' de Luana Melo de hoje, editada 15:08, com caption explícita 'Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga', traz pela primeira vez '14-Adriano Prudêncio de Oliveira 17k Pix (Lu)(W) Pg' com ✅ no dia 14/12, no lugar de Silvio Siqueira Lisboa (ver id 3124, cancelado). Marcação \"Pg\"+✅ presente — status Confirmado."}];
 const allSurgeriesGoiania = [...surgeriesGoianiaAgosto, ...surgeriesGoianiaSetembro, ...surgeriesGoianiaOutubro, ...surgeriesGoianiaNovembro, ...surgeriesGoianiaDezembro];
+allSurgeries.push(...allSurgeriesBarra, ...allSurgeriesGoiania);
 
 // ---------------- VOLUME DE VENDAS (grupo WhatsApp "Closeres") ----------------
 // Cada closer envia um "relatório diário" (ou "Relatório") no grupo Closeres com "Quantos atenderam" / "Quantos fecharam".
@@ -1521,6 +1539,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"17/11/2026 10:15",author:"Sistema (verificação automática agendada)",type:"reestruturação do painel: abas reordenadas, Consolidado Geral criado, filtro de período na Agenda, indicadores duplicados removidos",msg:"Atualização em 17/11/2026 10:15 (BRT). Reestruturação do painel solicitada pela Karina: reordenadas as abas (Agenda, Capi Hair, TG Barra, TG Goiânia, Volume de Vendas, Consolidado Geral); aba Histórico ocultada do menu (painel mantido, sem botão de acesso); aba Agenda agora inclui cirurgias das três unidades (Botafogo, TG Barra, TG Goiânia) com filtro de período (data de/até) para consulta retroativa; removidos os indicadores gerais duplicados das abas TG Barra e TG Goiânia (mantidos apenas os indicadores da própria unidade); criada a aba Consolidado Geral com totais mensais de todas as unidades (cirurgias, confirmações, reagendamentos, cancelamentos, alta prioridade, vendas fechadas e transplantes) e gráficos interativos. Nenhuma alteração de dados de cirurgias ou vendas nesta atualização."},
 {ts:"17/11/2026 10:07",author:"Sistema (verificação automática agendada)",type:"Closeres: 1 relatório retroativo de João Pedro (16/11) adicionado a salesReports; demais 3 fontes sem novidades",msg:"Verificação automática agendada em 17/11/2026 10:07 (BRT). Checkpoint anterior: 17/11/2026 09:20. Conferidas as 4 fontes obrigatórias via Claude in Chrome (WhatsApp Web). 1) AGENDA TC BOTAFOGO NOVEMBRO: nenhuma mensagem nova desde o checkpoint — última mensagem do grupo ('Incluindo sábado', 16/11 18:05) é anterior ao checkpoint e já refletida no array publicado; comparação dia a dia da repostagem completa integral de 16/11 18:04 (João Pedro) contra os 67 registros publicados em surgeriesNovembro conferiu exatamente, incluindo a pendência já registrada de Fabrício Caetano (id 1277) e Willian Oliveira (id 1295) ausentes do dia 21/11 (mantida, sem mensagem nova). 2) CLOSERES: 1 mensagem nova desde o checkpoint — 'Relatório João 16/11' enviado hoje às 09:23 (3 minutos após o checkpoint), relatório retroativo do dia 16/11: Atendimento 1, Fechamento (transplante) 1, Tratamento fechado 1, Vetado/Desqualificado 0, Indicações 1. Wallace (jordana) fechado transplante 13.500 (já havia atendido antes, veio negociar e pagar) — sem correspondência óbvia localizada em surgeriesNovembro (nenhum paciente 'Wallace' ativo com staff 'jordana'; existem apenas Wallace Rosa id1278/10-11 staff F,A e Wallace Teixeira Nunes id1263/16-11 staff F,JK, nenhum bate exatamente), pendência de correspondência registrada na nota. José (JP) fechado tratamento Bioestimulador 10.500 em 5x (tratamento, não entra em closedTransplante). Pallares (fabi): não fechou, paciente com medo da cirurgia. Nova entrada adicionada a salesReports: closer 'João Pedro Closer Capi Hair', date 2026-11-16, attended 1, closed 2, closedTransplante 1. Demais mensagens do grupo após o relatório (convite de reunião Google Meet e 'Bom dia meninas'/'Vamos entrar na reuniao', todas 09:31) são apenas organização interna, sem conteúdo acionável. 3) AGENDA TC BARRA: nenhuma mensagem nova desde o checkpoint — última mensagem ('Dia 27 ok', 16/11 12:38) é anterior ao checkpoint e já refletida no array publicado (Victor Hugo Ronque id 2103 confirmado 27/11, Marlon Ribeiro Dias id 2099 cancelado 17/11). 4) AGENDA TC GOIÂNIA: nenhuma mensagem nova desde o checkpoint — última edição ('Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga', 16/11 15:08/15:09) é anterior ao checkpoint e já refletida em surgeriesGoianiaDezembro. VALIDAÇÃO: sintaxe do bloco <script> inteiro validada com new Function() no console do navegador antes da publicação; nenhum id duplicado em nenhum array; closedTransplante (1) <= closed (2) na nova entrada de salesReports; filtro programático confirmou que não há registro Reagendado/Cancelado do mês corrente sem activeCount:false. TODAY mantido em 2026-11-17 (sem necessidade de avanço). Publicado via editor web do GitHub (CodeMirror6) com edição cirúrgica (sem reescrever o arquivo inteiro)."},
 {ts:"17/11/2026 09:20",author:"Sistema (verificação automática agendada)",type:"1 paciente novo em Botafogo (21/11), 2 vendas registradas (Closeres), pendência Fabrício/Willian confirmada novamente",msg:"Verificação automática agendada em 17/11/2026 09:20 (BRT). Checkpoint anterior: 16/11/2026 17:06. Conferidas as 4 fontes obrigatórias via Claude in Chrome (WhatsApp Web). 1) AGENDA TC BOTAFOGO NOVEMBRO: 2 mensagens novas desde o checkpoint, de João Pedro Closer Capi Hair em 16/11/2026 — repostagem completa integral às 18:04 ('Quarta feira com 3') e mensagem curta às 18:05 ('Incluindo sábado', sem conteúdo acionável adicional — todos os sábados do mês já estavam corretos). Comparação dia a dia programática entre a repostagem e os 66 registros já publicados em surgeriesNovembro revelou: (a) novo paciente Claudio Gonçalves Lopes (id 1306, 21/11, 13k em 10x, códigos A/A), 2º paciente do dia 21/11 junto a João Bernardo Silva do Couto (id 1232); (b) Fabrício Caetano (id 1277) e Willian Oliveira (id 1295), ambos Agendado para 21/11, permanecem ausentes desta repostagem (já ausentes também na repostagem anterior de 15:18, pendência registrada na verificação de 16/11) — mantidos Agendado por ambiguidade razoável (possível realocação de vaga para Claudio Gonçalves Lopes, sem mensagem explícita de cancelamento/remanejamento), com nota de confirmação adicional em ambos os registros; aguardando decisão explícita de Karina. Nenhuma outra divergência — demais dias de 02/11 a 30/11 conferem exatamente com o array publicado. 2) Closeres: 2 novos relatórios de fechamento desde o checkpoint — Relatório Luana GO 16/11/26 (18:15: Atendimentos 2, Fechamentos(transplante) 2, Indicações 4 — Ronaldo (Mayara) fechado 13.900, Celso (Waleska) fechado 15k, Luiz (Waleska) não fechou; TM 14.450 — sem correspondência localizada nas agendas de Goiânia) e Relatório 16/11 de Fabi Closer Capi Hair Barra (18:51: Atendimento 1, Fechamento 1, Vetado 1, Indicações 1 — Victor Hugo (Jordana) fechado 13.900 pago pix à vista, Alexandre (Jordana) grau 7 vetado; TM 13.900 — sem correspondência exata localizada na agenda de Barra). Ambos registrados em salesReports. Mensagem 'Relatório Assucena 13/11/26' (enviada 16/11 12:59, antes do checkpoint anterior de 17:06) foi revisada mas não gerou novo registro: campo 'Fechamentos (transplante)' em branco e o conteúdo (Bruno/Joyce, atendido sexta 13/11 e fechado sábado 14/11) já está coberto pelo registro existente de Assucena para 2026-11-14 (ts 16/11 09:23). 3) AGENDA TC BARRA: nenhuma mensagem nova desde o checkpoint (última mensagem, 'Dia 27 ok' às 12:38 de 16/11, é anterior ao checkpoint de 17:06 e já refletida no array publicado — conferido dia 17 vazio conforme mensagem 'Retirado paciente de amanhã por estar passando mal' e Victor Hugo Ronque id 2103 confirmado em 27/11). 4) AGENDA TC GOIÂNIA: nenhuma mensagem nova desde o checkpoint (última edição, 15:08/15:09 de 16/11, é anterior ao checkpoint de 17:06; conferido que os 4 ajustes de nomes/pagamento dessa edição — dias 01, 07, 09 e 14 de dezembro — já estão refletidos em surgeriesGoianiaDezembro). Validação antes de publicar: sintaxe do bloco script validada com new Function() no console; nenhum id duplicado nos arrays alterados; closedTransplante <= closed em ambos os novos salesReports; filtro programático confirmou que não há registro Reagendado/Cancelado em novembro sem activeCount:false. TODAY avançado para 2026-11-17 (4 fontes conferidas nesta execução). Publicado via editor web do GitHub (CodeMirror6) com edição cirúrgica."},
 {ts:"16/11/2026 17:06",author:"Sistema (ajuste solicitado por Karina)",type:"Ajuste de lógica: KPIs mês vigente",msg:"Ajuste no painel de KPIs (Agenda/Capi Hair, TG Barra, TG Goiânia): Total de Cirurgias, Cancelamentos e Reagendamentos passaram a somar apenas registros do mês vigente de TODAY, em vez de todos os meses combinados. Cirurgias da Semana e Próxima Semana não foram alteradas (já eram janelas de 7 dias relativas a TODAY). O filtro por mês é dinâmico (baseado em TODAY.split) e se atualiza automaticamente em toda futura verificação, sem necessidade de ajuste manual."},
@@ -2219,6 +2238,7 @@ function renderSidebar(){
 
 // ---------------- AGENDA ----------------
 function viewRange(){
+  if(state.customFrom && state.customTo){ return [state.customFrom, state.customTo]; }
   const today = new Date(TODAY+"T12:00:00");
   let start, end;
   if(state.view==="dia"){ start=new Date(today); end=new Date(today); }
@@ -2342,6 +2362,67 @@ function renderCharts(){
   chartRefs.sem = new Chart(document.getElementById('chartSemana'), {type:'bar',
     data:{labels:Object.keys(weeks),datasets:[{label:'Cirurgias',data:Object.values(weeks),backgroundColor:'#6366f1',borderRadius:4}]},
     options:baseOpts(false)});
+}
+
+function renderConsolidado(){
+  destroyCharts();
+  const combined = [...allSurgeries, ...allSurgeriesBarra, ...allSurgeriesGoiania];
+  const months = uniq(combined.map(s=>s.date.slice(0,7))).sort();
+  const mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const monthLabel = m => { const p = m.split('-'); return mesesNomes[Number(p[1])-1]+'/'+p[0].slice(2); };
+  const rows = months.map(m=>{
+    const arr = combined.filter(s=>s.date.slice(0,7)===m);
+    const vendasArr = salesReports.filter(r=>r.date.slice(0,7)===m);
+    return {
+      m,
+      cirurgias: arr.filter(s=>s.activeCount!==false).length,
+      confirmadas: arr.filter(s=>s.status==='Confirmado'&&s.activeCount!==false).length,
+      agendadas: arr.filter(s=>s.status==='Agendado'&&s.activeCount!==false).length,
+      reagendadas: arr.filter(s=>s.status==='Reagendado').length,
+      canceladas: arr.filter(s=>s.status==='Cancelado').length,
+      altaPrioridade: arr.filter(s=>s.status==='Alta prioridade'&&s.activeCount!==false).length,
+      vendasFechadas: vendasArr.reduce((a,r)=>a+(r.closed||0),0),
+      vendasTransplante: vendasArr.reduce((a,r)=>a+(r.closedTransplante||0),0)
+    };
+  });
+  const tbody = document.getElementById('consolidadoTableBody');
+  if(tbody){
+    tbody.innerHTML = rows.map(r=>'<tr><td>'+monthLabel(r.m)+'</td><td>'+r.cirurgias+'</td><td>'+r.confirmadas+'</td><td>'+r.agendadas+'</td><td>'+r.reagendadas+'</td><td>'+r.canceladas+'</td><td>'+r.altaPrioridade+'</td><td>'+r.vendasFechadas+'</td><td>'+r.vendasTransplante+'</td></tr>').join('');
+  }
+  const ctxMes = document.getElementById('chartConsolidadoMes');
+  if(ctxMes){
+    chartRefs.consolidadoMes = new Chart(ctxMes, {
+      type:'bar',
+      data:{labels: rows.map(r=>monthLabel(r.m)), datasets:[{label:'Cirurgias', data: rows.map(r=>r.cirurgias), backgroundColor:'#4f46e5', borderRadius:4}]},
+      options: baseOpts(false)
+    });
+  }
+  const ctxVendas = document.getElementById('chartConsolidadoVendas');
+  if(ctxVendas){
+    chartRefs.consolidadoVendas = new Chart(ctxVendas, {
+      type:'bar',
+      data:{labels: rows.map(r=>monthLabel(r.m)), datasets:[
+        {label:'Vendas fechadas', data: rows.map(r=>r.vendasFechadas), backgroundColor:'#22c55e', borderRadius:4},
+        {label:'Transplantes', data: rows.map(r=>r.vendasTransplante), backgroundColor:'#a855f7', borderRadius:4}
+      ]},
+      options: baseOpts(false)
+    });
+  }
+  const ctxStatus = document.getElementById('chartConsolidadoStatus');
+  if(ctxStatus){
+    const statusTotals = {
+      Agendado: combined.filter(s=>s.status==='Agendado'&&s.activeCount!==false).length,
+      Confirmado: combined.filter(s=>s.status==='Confirmado'&&s.activeCount!==false).length,
+      Reagendado: combined.filter(s=>s.status==='Reagendado').length,
+      Cancelado: combined.filter(s=>s.status==='Cancelado').length,
+      'Alta prioridade': combined.filter(s=>s.status==='Alta prioridade'&&s.activeCount!==false).length
+    };
+    chartRefs.consolidadoStatus = new Chart(ctxStatus, {
+      type:'pie',
+      data:{labels:Object.keys(statusTotals), datasets:[{data:Object.values(statusTotals), backgroundColor:['#3b82f6','#22c55e','#eab308','#ef4444','#a855f7']}]},
+      options: baseOpts(true)
+    });
+  }
 }
 
 function renderHeatmap(){
@@ -2789,6 +2870,9 @@ document.getElementById('fHospital').addEventListener('change', e=>{ state.hospi
 document.getElementById('fStaff').addEventListener('change', e=>{ state.staff = e.target.value; renderAgenda(); });
 document.getElementById('fStatus').addEventListener('change', e=>{ state.status = e.target.value; renderAgenda(); });
 document.getElementById('fProc').addEventListener('change', e=>{ state.proc = e.target.value; renderAgenda(); });
+document.getElementById('fDateFrom').addEventListener('change', e=>{ state.customFrom = e.target.value || null; renderAgenda(); });
+document.getElementById('fDateTo').addEventListener('change', e=>{ state.customTo = e.target.value || null; renderAgenda(); });
+document.getElementById('fDateClear').addEventListener('click', ()=>{ state.customFrom=null; state.customTo=null; document.getElementById('fDateFrom').value=''; document.getElementById('fDateTo').value=''; renderAgenda(); });
 document.querySelectorAll('#viewToggle button').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('#viewToggle button').forEach(b=>b.classList.remove('active'));
@@ -2805,10 +2889,13 @@ document.querySelectorAll('.tab').forEach(t=>{
     document.getElementById('tab-historico').style.display = t.dataset.tab==='historico'?'block':'none';
     document.getElementById('tab-barra').style.display = t.dataset.tab==='barra'?'block':'none';
     document.getElementById('tab-goiania').style.display = t.dataset.tab==='goiania'?'block':'none';
+    document.getElementById('tab-consolidado').style.display = t.dataset.tab==='consolidado'?'block':'none';
+    document.getElementById('kpiRow').style.display = (t.dataset.tab==='barra'||t.dataset.tab==='goiania')?'none':'';
     if(t.dataset.tab==='indicadores'){ renderCharts(); renderHeatmap(); renderHeatmapAgosto(); renderHeatmapSetembro(); renderHeatmapOutubro(); renderHeatmapNovembro(); renderAgostoList(); }
     if(t.dataset.tab==='vendas'){ renderVendas(); }
     if(t.dataset.tab==='barra'){ renderKPIsGeneric('kpiRowBarra', allSurgeriesBarra); renderHeatmapBarraAgosto(); renderHeatmapBarraSetembro(); renderHeatmapBarraOutubro(); renderHeatmapBarraNovembro(); renderListGeneric('barraListBody', allSurgeriesBarra); }
     if(t.dataset.tab==='goiania'){ renderKPIsGeneric('kpiRowGoiania', allSurgeriesGoiania); renderHeatmapGoianiaAgosto(); renderHeatmapGoianiaSetembro(); renderHeatmapGoianiaOutubro(); renderHeatmapGoianiaNovembro(); renderListGeneric('goianiaListBody', allSurgeriesGoiania); }
+    if(t.dataset.tab==='consolidado'){ renderConsolidado(); }
   });
 });
 document.getElementById('refreshBtn').addEventListener('click', ()=>{
