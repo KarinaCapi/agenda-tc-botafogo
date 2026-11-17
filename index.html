@@ -540,30 +540,34 @@ tr:last-child td{border-bottom:none;}
       </div>
       <div id="tab-consolidado" style="display:none;">
         <div class="panel">
-          <div class="panel-head"><h3>Consolidado Geral — todas as unidades</h3></div>
-          <div class="kpis" id="kpiRowConsolidadoUnidades" style="grid-template-columns:repeat(3,1fr);"></div>
+          <div class="panel-head"><h3>Consolidado Geral — todas as unidades (período completo)</h3></div>
+          <div class="kpis" id="kpiRowConsolidadoGeral" style="grid-template-columns:repeat(4,1fr);"></div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3>Cirurgias por mês e por unidade</h3></div>
+          <div class="panel-head"><h3>Indicadores por unidade</h3></div>
+          <div id="consolidadoPorUnidadeCards"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Cirurgias realizadas por mês e por unidade</h3></div>
           <table>
-            <thead><tr><th>Mês</th><th>Botafogo</th><th>TG Barra</th><th>TG Goiânia</th><th>Total</th></tr></thead>
+            <thead><tr><th>Mês</th><th>Capi Hair (Botafogo)</th><th>TG Barra</th><th>TG Goiânia</th><th>Total realizadas</th></tr></thead>
             <tbody id="consolidadoPorUnidadeBody"></tbody>
           </table>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3>Resumo mensal consolidado (todas as unidades)</h3></div>
+          <div class="panel-head"><h3>Resumo mensal consolidado — agendadas, realizadas, reagendamentos e cancelamentos (todas as unidades)</h3></div>
           <table>
-            <thead><tr><th>Mês</th><th>Cirurgias</th><th>Confirmadas</th><th>Agendadas</th><th>Reagendamentos</th><th>Cancelamentos</th><th>Alta Prioridade</th><th>Vendas Fechadas</th><th>Transplantes Fechados</th></tr></thead>
+            <thead><tr><th>Mês</th><th>Agendadas</th><th>Realizadas</th><th>Reagendamentos</th><th>% Reagendamento</th><th>Cancelamentos</th><th>% Cancelamento</th></tr></thead>
             <tbody id="consolidadoTableBody"></tbody>
           </table>
         </div>
         <div class="panel">
           <div class="panel-head"><h3>Gráficos</h3></div>
           <div class="charts-grid">
-            <div class="chart-box"><h4>Cirurgias por mês, por unidade</h4><canvas id="chartConsolidadoUnidade"></canvas></div>
-            <div class="chart-box"><h4>Distribuição de cirurgias por unidade (total)</h4><canvas id="chartConsolidadoUnidadePie"></canvas></div>
-            <div class="chart-box"><h4>Vendas fechadas por mês</h4><canvas id="chartConsolidadoVendas"></canvas></div>
-            <div class="chart-box"><h4>Distribuição de status (período total)</h4><canvas id="chartConsolidadoStatus"></canvas></div>
+            <div class="chart-box"><h4>Cirurgias agendadas x realizadas, por mês</h4><canvas id="chartConsolidadoUnidade"></canvas></div>
+            <div class="chart-box"><h4>Distribuição de cirurgias realizadas por unidade (total do período)</h4><canvas id="chartConsolidadoUnidadePie"></canvas></div>
+            <div class="chart-box"><h4>Transplantes realizados por mês, por unidade</h4><canvas id="chartConsolidadoVendas"></canvas></div>
+            <div class="chart-box"><h4>Distribuição por status (período total)</h4><canvas id="chartConsolidadoStatus"></canvas></div>
           </div>
         </div>
       </div>
@@ -596,7 +600,7 @@ tr:last-child td{border-bottom:none;}
 
 // ---------------- DATA ----------------
 const LAST_UPDATE = "VERIFICAÇÃO em 17/11/2026 10:07 BRT (verificação automática agendada) — Closeres: 1 relatório retroativo de João Pedro (dia 16/11, enviado hoje às 09:23, 3min após o checkpoint anterior) adicionado a salesReports (1 fechamento transplante + 1 tratamento fechado; José/Bioestimulador e Wallace/jordana sem correspondência óbvia na agenda, pendência de correspondência registrada). Demais 3 fontes (Botafogo Novembro, Barra, Goiânia) sem mensagens novas desde o checkpoint anterior (17/11 09:20) — última mensagem de cada uma já estava refletida no array publicado. | AJUSTE em 16/11/2026 17:06 BRT — Painel de KPIs (Total de Cirurgias, Cancelamentos, Reagendamentos) ajustado para considerar somente o mês vigente de TODAY, em vez da soma de todos os meses; Cirurgias da Semana/Próxima Semana continuam como janelas dinâmicas de 7 dias relativas a TODAY. Filtro é automático e acompanha TODAY em toda verificação futura. | VERIFICAÇÃO em 16/11/2026 15:29 BRT (verificação automática agendada) — Botafogo Nov: Antônio Fernando Gouveia incluído dia 20/11 ('Incluindo dia 20'), Luciano Duque incluído dia 18/11 ('Quarta feira com 3', possível retorno do paciente cancelado id 1253 por febre); pendência registrada para Fabrício Caetano (id 1277) e Willian Oliveira (id 1295), ausentes do dia 21/11 nas repostagens mais recentes sem mensagem explícita. Barra Nov: Victor Hugo Ronque incluído e confirmado dia 27/11 ('Dia 27 ok'). Goiânia Dez: repostagem editada de Luana Melo (caption 'Alterando nomes em 01, 07, 09 e 14') trouxe 3 remanejamentos (Thyago/Thiago Soares da Silva 01→09/12, Francisco Fábio de S Nascimento 07→01/12) e 2 substituições (João Marcus Lourenço Terra novo no dia 07/12, Adriano Prudêncio de Oliveira novo no dia 14/12 no lugar de Silvio Siqueira Lisboa cancelado), além de confirmação (✅) de Jean Carlos Martins no dia 22/12; pendência registrada para José Gilmar Pires da Silva (id 3135, dia 29/12), ausente da repostagem mais recente (substituído por 'Sérgio Costa e Souza' sem mensagem explícita confirmando a troca). CORREÇÃO em 16/11/2026 13:14 BRT (verificação manual solicitada por Karina) — releitura cuidadosa do grupo Closeres: a verificação automática anterior (16/11/2026 12:41) havia capturado apenas os relatórios de João Pedro Closer Capi Hair e Assucena Closer Capi Hair para 13/11 e 14/11, deixando de fora os relatórios de Luana Melo (closer Goiânia) e Fabi Closer Capi Hair Barra para os mesmos dias — identificados agora via busca por 'Relatório' dentro do próprio chat do grupo Closeres. Adicionadas 4 entradas a salesReports: Luana Melo 13/11/26 (2 atendimentos, 1 fechamento transplante — Fellipe/indicação 15k, possível correspondência com id 3142 Fellipe Teixeira Lagares em surgeriesGoianiaDezembro, mesmo valor); Fabi Mazzoleni 13/11/26 (2 atendimentos, 1 fechamento — Jucyara/Joyce 13.900 em 12x sinal 6k); Luana Melo 14/11/26 (3 atendimentos, 3 fechamentos — Tarcísio/Waleska 25k, João Marcus/Waleska 18.900, Adriano/Waleska 17k); Fabi Mazzoleni 14/11/26 (2 atendimentos, 1 fechamento — Pablo 13.900 sinal 5k). Total de fechamentos agora contabilizados corretamente: 13/11 = 2 (Luana 1 + Fabi 1; João Pedro e Assucena não fecharam nenhuma venda neste dia), 14/11 = 5 (João Pedro 0 + Assucena 1 + Luana 3 + Fabi 1). Nenhuma alteração nos arrays de agenda (surgeries*) nesta correção — apenas em salesReports. Validação: sintaxe do bloco <script> conferida com new Function; closedTransplante <= closed conferido nas 4 novas entradas; nenhum id duplicado."
-const LAST_UPDATE_TS = "17/11/2026 10:35"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
+const LAST_UPDATE_TS = "17/11/2026 11:55"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
 
 const TODAY = "2026-11-17";
 
@@ -1558,6 +1562,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"17/11/2026 11:55",author:"Sistema (ajuste solicitado por Karina)",type:"correção",msg:"Consolidado Geral redesenhado para maior clareza: adicionados percentuais de reagendamento e cancelamento; títulos agora especificam \'realizadas\' x \'agendadas (futuras)\'; removidas colunas Confirmadas/Alta Prioridade e a métrica ambígua Vendas Fechadas (dados de vendas já ficam na aba Volume de Vendas); tabela de resumo mensal agora mostra Agendadas, Realizadas, Reagendamentos (+%) e Cancelamentos (+%); Gráfico 1 agora compara agendadas x realizadas por mês; Gráfico 3 passou a mostrar transplantes realizados por mês e por unidade (Botafogo/Barra/Goiânia); Gráfico 4 simplificado para Realizada/Agendada(futura)/Reagendada/Cancelada."},
 {ts:"17/11/2026 10:35",author:"Sistema (verificação automática agendada)",type:"correção de layout: Consolidado Geral fora do lugar (metade da tela) e indicador geral duplicado na aba Capi Hair",msg:"Correção em 17/11/2026 10:35 (BRT), a pedido da Karina, de dois problemas visuais introduzidos na reestruturação anterior (10:15): (1) a aba Consolidado Geral estava posicionada fora da área principal do painel (como irmã de .main dentro de .body-wrap), ocupando só metade da tela — movida para dentro de .main, como irmã das demais abas; (2) a aba Capi Hair estava mostrando o indicador geral (combinado das 3 unidades) em vez do indicador próprio de Botafogo — criado um indicador dedicado (kpiRowIndicadores) com dados só de Botafogo, e o indicador geral (#kpiRow) agora fica oculto nas abas Capi Hair, TG Barra, TG Goiânia e Consolidado Geral, aparecendo só na Agenda. Também foi criada uma nova variável allSurgeriesCombined (Botafogo+Barra+Goiânia) usada exclusivamente pelos filtros e indicadores da Agenda, sem alterar allSurgeries (que volta a representar só Botafogo, corrigindo também os gráficos e heatmaps da aba Capi Hair que haviam sido contaminados pelos dados das outras filiais). A aba Consolidado Geral foi ampliada: agora traz cards de indicadores isolados por filial, uma tabela de cirurgias por mês e por unidade, além da tabela e gráficos consolidados já existentes. Nenhum dado de cirurgia ou venda foi alterado."},
 {ts:"17/11/2026 10:15",author:"Sistema (verificação automática agendada)",type:"reestruturação do painel: abas reordenadas, Consolidado Geral criado, filtro de período na Agenda, indicadores duplicados removidos",msg:"Atualização em 17/11/2026 10:15 (BRT). Reestruturação do painel solicitada pela Karina: reordenadas as abas (Agenda, Capi Hair, TG Barra, TG Goiânia, Volume de Vendas, Consolidado Geral); aba Histórico ocultada do menu (painel mantido, sem botão de acesso); aba Agenda agora inclui cirurgias das três unidades (Botafogo, TG Barra, TG Goiânia) com filtro de período (data de/até) para consulta retroativa; removidos os indicadores gerais duplicados das abas TG Barra e TG Goiânia (mantidos apenas os indicadores da própria unidade); criada a aba Consolidado Geral com totais mensais de todas as unidades (cirurgias, confirmações, reagendamentos, cancelamentos, alta prioridade, vendas fechadas e transplantes) e gráficos interativos. Nenhuma alteração de dados de cirurgias ou vendas nesta atualização."},
 {ts:"17/11/2026 10:07",author:"Sistema (verificação automática agendada)",type:"Closeres: 1 relatório retroativo de João Pedro (16/11) adicionado a salesReports; demais 3 fontes sem novidades",msg:"Verificação automática agendada em 17/11/2026 10:07 (BRT). Checkpoint anterior: 17/11/2026 09:20. Conferidas as 4 fontes obrigatórias via Claude in Chrome (WhatsApp Web). 1) AGENDA TC BOTAFOGO NOVEMBRO: nenhuma mensagem nova desde o checkpoint — última mensagem do grupo ('Incluindo sábado', 16/11 18:05) é anterior ao checkpoint e já refletida no array publicado; comparação dia a dia da repostagem completa integral de 16/11 18:04 (João Pedro) contra os 67 registros publicados em surgeriesNovembro conferiu exatamente, incluindo a pendência já registrada de Fabrício Caetano (id 1277) e Willian Oliveira (id 1295) ausentes do dia 21/11 (mantida, sem mensagem nova). 2) CLOSERES: 1 mensagem nova desde o checkpoint — 'Relatório João 16/11' enviado hoje às 09:23 (3 minutos após o checkpoint), relatório retroativo do dia 16/11: Atendimento 1, Fechamento (transplante) 1, Tratamento fechado 1, Vetado/Desqualificado 0, Indicações 1. Wallace (jordana) fechado transplante 13.500 (já havia atendido antes, veio negociar e pagar) — sem correspondência óbvia localizada em surgeriesNovembro (nenhum paciente 'Wallace' ativo com staff 'jordana'; existem apenas Wallace Rosa id1278/10-11 staff F,A e Wallace Teixeira Nunes id1263/16-11 staff F,JK, nenhum bate exatamente), pendência de correspondência registrada na nota. José (JP) fechado tratamento Bioestimulador 10.500 em 5x (tratamento, não entra em closedTransplante). Pallares (fabi): não fechou, paciente com medo da cirurgia. Nova entrada adicionada a salesReports: closer 'João Pedro Closer Capi Hair', date 2026-11-16, attended 1, closed 2, closedTransplante 1. Demais mensagens do grupo após o relatório (convite de reunião Google Meet e 'Bom dia meninas'/'Vamos entrar na reuniao', todas 09:31) são apenas organização interna, sem conteúdo acionável. 3) AGENDA TC BARRA: nenhuma mensagem nova desde o checkpoint — última mensagem ('Dia 27 ok', 16/11 12:38) é anterior ao checkpoint e já refletida no array publicado (Victor Hugo Ronque id 2103 confirmado 27/11, Marlon Ribeiro Dias id 2099 cancelado 17/11). 4) AGENDA TC GOIÂNIA: nenhuma mensagem nova desde o checkpoint — última edição ('Alterando nomes em 01, 07, 09 e 14 Colocando informações de cirurgia paga', 16/11 15:08/15:09) é anterior ao checkpoint e já refletida em surgeriesGoianiaDezembro. VALIDAÇÃO: sintaxe do bloco <script> inteiro validada com new Function() no console do navegador antes da publicação; nenhum id duplicado em nenhum array; closedTransplante (1) <= closed (2) na nova entrada de salesReports; filtro programático confirmou que não há registro Reagendado/Cancelado do mês corrente sem activeCount:false. TODAY mantido em 2026-11-17 (sem necessidade de avanço). Publicado via editor web do GitHub (CodeMirror6) com edição cirúrgica (sem reescrever o arquivo inteiro)."},
@@ -2396,22 +2401,49 @@ function renderConsolidado(){
     {label:'TG Barra', arr: allSurgeriesBarra},
     {label:'TG Goiânia', arr: allSurgeriesGoiania}
   ];
-  const kpiU = document.getElementById('kpiRowConsolidadoUnidades');
-  if(kpiU){
-    kpiU.innerHTML = unidades.map(u=>{
-      const ativos = u.arr.filter(s=>s.activeCount!==false).length;
-      const resched = u.arr.filter(s=>s.status==='Reagendado').length;
-      const cancel = u.arr.filter(s=>s.status==='Cancelado').length;
-      return '<div class="kpi c-ink"><div class="v">'+ativos+'</div><div class="l">'+u.label+' — Cirurgias</div></div>'
-        + '<div class="kpi c-yellow"><div class="v">'+resched+'</div><div class="l">'+u.label+' — Reagendamentos</div></div>'
-        + '<div class="kpi c-red"><div class="v">'+cancel+'</div><div class="l">'+u.label+' — Cancelamentos</div></div>';
+
+  function metrics(arr, m){
+    const byMonth = s => m ? (s.date.slice(0,7)===m) : true;
+    const realizadas = arr.filter(s=>byMonth(s) && s.activeCount!==false && s.date<=TODAY).length;
+    const futuras = arr.filter(s=>byMonth(s) && s.activeCount!==false && s.date>TODAY).length;
+    const agendadas = realizadas + futuras;
+    const reagendadas = arr.filter(s=>byMonth(s) && s.status==='Reagendado').length;
+    const canceladas = arr.filter(s=>byMonth(s) && s.status==='Cancelado').length;
+    const base = agendadas + reagendadas + canceladas;
+    const pctReag = base>0 ? (reagendadas/base*100) : 0;
+    const pctCancel = base>0 ? (canceladas/base*100) : 0;
+    return {realizadas, futuras, agendadas, reagendadas, canceladas, pctReag, pctCancel};
+  }
+
+  const totalGeral = metrics(combined);
+  const kpiGeral = document.getElementById('kpiRowConsolidadoGeral');
+  if(kpiGeral){
+    kpiGeral.innerHTML =
+      '<div class="kpi c-green"><div class="v">'+totalGeral.realizadas+'</div><div class="l">Cirurgias realizadas (período)</div></div>'
+      + '<div class="kpi c-blue"><div class="v">'+totalGeral.futuras+'</div><div class="l">Agendadas (futuras)</div></div>'
+      + '<div class="kpi c-yellow"><div class="v">'+totalGeral.reagendadas+' <span style="font-size:.6em;opacity:.8;">('+totalGeral.pctReag.toFixed(1)+'%)</span></div><div class="l">Reagendamentos (período)</div></div>'
+      + '<div class="kpi c-red"><div class="v">'+totalGeral.canceladas+' <span style="font-size:.6em;opacity:.8;">('+totalGeral.pctCancel.toFixed(1)+'%)</span></div><div class="l">Cancelamentos (período)</div></div>';
+  }
+
+  const unitCardsEl = document.getElementById('consolidadoPorUnidadeCards');
+  if(unitCardsEl){
+    unitCardsEl.innerHTML = unidades.map(u=>{
+      const mt = metrics(u.arr);
+      return '<div style="margin-bottom:14px;">'
+        + '<div style="font-weight:600;margin-bottom:6px;opacity:.85;">'+u.label+'</div>'
+        + '<div class="kpis" style="grid-template-columns:repeat(4,1fr);">'
+        + '<div class="kpi c-green"><div class="v">'+mt.realizadas+'</div><div class="l">Realizadas</div></div>'
+        + '<div class="kpi c-blue"><div class="v">'+mt.futuras+'</div><div class="l">Agendadas (futuras)</div></div>'
+        + '<div class="kpi c-yellow"><div class="v">'+mt.reagendadas+' ('+mt.pctReag.toFixed(1)+'%)</div><div class="l">Reagendamentos</div></div>'
+        + '<div class="kpi c-red"><div class="v">'+mt.canceladas+' ('+mt.pctCancel.toFixed(1)+'%)</div><div class="l">Cancelamentos</div></div>'
+        + '</div></div>';
     }).join('');
   }
 
   const rowsUnidade = months.map(m=>{
-    const b = allSurgeries.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false).length;
-    const ba = allSurgeriesBarra.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false).length;
-    const go = allSurgeriesGoiania.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false).length;
+    const b = allSurgeries.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false && s.date<=TODAY).length;
+    const ba = allSurgeriesBarra.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false && s.date<=TODAY).length;
+    const go = allSurgeriesGoiania.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false && s.date<=TODAY).length;
     return {m, b, ba, go, total: b+ba+go};
   });
   const tbodyU = document.getElementById('consolidadoPorUnidadeBody');
@@ -2420,74 +2452,61 @@ function renderConsolidado(){
   }
 
   const rows = months.map(m=>{
-    const arr = combined.filter(s=>s.date.slice(0,7)===m);
-    const vendasArr = salesReports.filter(r=>r.date.slice(0,7)===m);
-    return {
-      m,
-      cirurgias: arr.filter(s=>s.activeCount!==false).length,
-      confirmadas: arr.filter(s=>s.status==='Confirmado'&&s.activeCount!==false).length,
-      agendadas: arr.filter(s=>s.status==='Agendado'&&s.activeCount!==false).length,
-      reagendadas: arr.filter(s=>s.status==='Reagendado').length,
-      canceladas: arr.filter(s=>s.status==='Cancelado').length,
-      altaPrioridade: arr.filter(s=>s.status==='Alta prioridade'&&s.activeCount!==false).length,
-      vendasFechadas: vendasArr.reduce((a,r)=>a+(r.closed||0),0),
-      vendasTransplante: vendasArr.reduce((a,r)=>a+(r.closedTransplante||0),0)
-    };
+    const mt = metrics(combined, m);
+    return Object.assign({m}, mt);
   });
   const tbody = document.getElementById('consolidadoTableBody');
   if(tbody){
-    tbody.innerHTML = rows.map(r=>'<tr><td>'+monthLabel(r.m)+'</td><td>'+r.cirurgias+'</td><td>'+r.confirmadas+'</td><td>'+r.agendadas+'</td><td>'+r.reagendadas+'</td><td>'+r.canceladas+'</td><td>'+r.altaPrioridade+'</td><td>'+r.vendasFechadas+'</td><td>'+r.vendasTransplante+'</td></tr>').join('');
+    tbody.innerHTML = rows.map(r=>'<tr><td>'+monthLabel(r.m)+'</td><td>'+r.agendadas+'</td><td>'+r.realizadas+'</td><td>'+r.reagendadas+'</td><td>'+r.pctReag.toFixed(1)+'%</td><td>'+r.canceladas+'</td><td>'+r.pctCancel.toFixed(1)+'%</td></tr>').join('');
   }
 
-  const ctxU = document.getElementById('chartConsolidadoUnidade');
-  if(ctxU){
-    chartRefs.consolidadoUnidade = new Chart(ctxU, {
+  const ctx1 = document.getElementById('chartConsolidadoUnidade');
+  if(ctx1){
+    chartRefs.consolidadoUnidade = new Chart(ctx1, {
       type:'bar',
-      data:{labels: rowsUnidade.map(r=>monthLabel(r.m)), datasets:[
-        {label:'Botafogo', data: rowsUnidade.map(r=>r.b), backgroundColor:'#4f46e5', borderRadius:4},
-        {label:'TG Barra', data: rowsUnidade.map(r=>r.ba), backgroundColor:'#22c55e', borderRadius:4},
-        {label:'TG Goiânia', data: rowsUnidade.map(r=>r.go), backgroundColor:'#eab308', borderRadius:4}
-      ]},
+      data:{
+        labels: months.map(monthLabel),
+        datasets:[
+          {label:'Agendadas', data: rows.map(r=>r.agendadas), backgroundColor: palette[0]},
+          {label:'Realizadas', data: rows.map(r=>r.realizadas), backgroundColor: palette[1]}
+        ]
+      },
       options: baseOpts(false)
     });
   }
 
-  const ctxUPie = document.getElementById('chartConsolidadoUnidadePie');
-  if(ctxUPie){
-    const totalB = allSurgeries.filter(s=>s.activeCount!==false).length;
-    const totalBa = allSurgeriesBarra.filter(s=>s.activeCount!==false).length;
-    const totalGo = allSurgeriesGoiania.filter(s=>s.activeCount!==false).length;
-    chartRefs.consolidadoUnidadePie = new Chart(ctxUPie, {
+  const ctx2 = document.getElementById('chartConsolidadoUnidadePie');
+  if(ctx2){
+    const totals = unidades.map(u=>metrics(u.arr).realizadas);
+    chartRefs.consolidadoUnidadePie = new Chart(ctx2, {
       type:'pie',
-      data:{labels:['Botafogo','TG Barra','TG Goiânia'], datasets:[{data:[totalB,totalBa,totalGo], backgroundColor:['#4f46e5','#22c55e','#eab308']}]},
+      data:{ labels: unidades.map(u=>u.label), datasets:[{data: totals, backgroundColor: palette.slice(0,3)}] },
       options: baseOpts(true)
     });
   }
 
-  const ctxVendas = document.getElementById('chartConsolidadoVendas');
-  if(ctxVendas){
-    chartRefs.consolidadoVendas = new Chart(ctxVendas, {
+  const ctx3 = document.getElementById('chartConsolidadoVendas');
+  if(ctx3){
+    const seriesU = unidades.map((u,i)=>({
+      label: u.label,
+      data: months.map(m=> u.arr.filter(s=>s.date.slice(0,7)===m && s.activeCount!==false && s.date<=TODAY).length ),
+      backgroundColor: palette[i]
+    }));
+    chartRefs.consolidadoVendas = new Chart(ctx3, {
       type:'bar',
-      data:{labels: rows.map(r=>monthLabel(r.m)), datasets:[
-        {label:'Vendas fechadas', data: rows.map(r=>r.vendasFechadas), backgroundColor:'#22c55e', borderRadius:4},
-        {label:'Transplantes', data: rows.map(r=>r.vendasTransplante), backgroundColor:'#a855f7', borderRadius:4}
-      ]},
+      data:{ labels: months.map(monthLabel), datasets: seriesU },
       options: baseOpts(false)
     });
   }
 
-  const ctxStatus = document.getElementById('chartConsolidadoStatus');
-  if(ctxStatus){
-    const statusTotals = {
-      Agendado: combined.filter(s=>s.status==='Agendado'&&s.activeCount!==false).length,
-      Confirmado: combined.filter(s=>s.status==='Confirmado'&&s.activeCount!==false).length,
-      Reagendado: combined.filter(s=>s.status==='Reagendado').length,
-      Cancelado: combined.filter(s=>s.status==='Cancelado').length,
-      'Alta prioridade': combined.filter(s=>s.status==='Alta prioridade'&&s.activeCount!==false).length
-    };
-    chartRefs.consolidadoStatus = new Chart(ctxStatus, {
+  const ctx4 = document.getElementById('chartConsolidadoStatus');
+  if(ctx4){
+    chartRefs.consolidadoStatus = new Chart(ctx4, {
       type:'pie',
-      data:{labels:Object.keys(statusTotals), datasets:[{data:Object.values(statusTotals), backgroundColor:['#3b82f6','#22c55e','#eab308','#ef4444','#a855f7']}]},
+      data:{
+        labels:['Realizada','Agendada (futura)','Reagendada','Cancelada'],
+        datasets:[{data:[totalGeral.realizadas, totalGeral.futuras, totalGeral.reagendadas, totalGeral.canceladas], backgroundColor:[palette[1], palette[0], palette[2], palette[3]]}]
+      },
       options: baseOpts(true)
     });
   }
