@@ -76,6 +76,19 @@ body.authed #loginGate{display:none;}
 .kpi .l{font-size:11px;color:var(--text-2);margin-top:2px;font-weight:600;}
 .kpi.c-blue .v{color:var(--blue);} .kpi.c-green .v{color:var(--green);} .kpi.c-yellow .v{color:var(--yellow);}
 .kpi.c-red .v{color:var(--red);} .kpi.c-purple .v{color:var(--purple);} .kpi.c-ink .v{color:var(--accent);}
+.kpi-funnel{display:flex;gap:0;margin-bottom:20px;flex-wrap:wrap;}
+.funnel-step{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px 22px;position:relative;color:#fff;box-shadow:var(--shadow);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%);}
+.funnel-step:first-child{clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%);padding-left:18px;}
+.funnel-step:last-child{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,18px 50%);}
+.funnel-step+.funnel-step{margin-left:-18px;}
+.funnel-step .v{font-size:24px;font-weight:800;line-height:1.1;}
+.funnel-step .l{font-size:11px;font-weight:700;margin-top:3px;opacity:.95;letter-spacing:.2px;}
+.funnel-step.fn-ink{background:var(--accent);}
+.funnel-step.fn-green{background:var(--green);}
+.funnel-step.fn-yellow{background:var(--yellow);color:#3f2d00;}
+.funnel-step.fn-red{background:var(--red);}
+.funnel-step.fn-blue{background:var(--blue);}
+@media (max-width:800px){.kpi-funnel{flex-direction:column;} .funnel-step,.funnel-step:first-child,.funnel-step:last-child{clip-path:none!important;border-radius:10px;margin:0 0 4px 0!important;}}
 /* Selo de percentual dentro do card de KPI (a pedido de Karina, 01/09/2026) — usado nos cards de "capacidade de venda
    do mês" (formato "atingido/capacidade" no valor principal + este selo com o %). Cor por faixa: >=100% batida (verde),
    >=70% em andamento (amarelo), <70% atrás da meta (vermelho) — mesmos limiares já usados em metaCellHtml(). */
@@ -628,8 +641,8 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "VERIFICAÇÃO em 19/11/2026 12:30 BRT — rotina checou os 4 grupos obrigatórios (Botafogo Novembro+Dezembro, Closeres, AGENDA TC BARRA, AGENDA TC GOIÂNIA). Novidades: Botafogo Novembro ganhou Jose Fernando da Silva (19/11) e teve 2 reagendamentos resolvidos (Rodrigo Marques da Silva 18→24/11, Rodolfo Assis Lopes 14→23/11) e 1 cancelamento silencioso (Mauro dittz, 28/11); Botafogo Dezembro ganhou Marcos Felipe Torquato (02/12); TG Barra corrigiu Eduardo Barroso para Confirmado (pendência de 'Dia 05 ok'); TG Goiânia corrigiu Ralf Silva dos Santos para Confirmado e resolveu a pendência do dia 29/12 (José Gilmar → Sérgio Costa e Souza, Cancelado/novo registro). Closeres sem relatório novo de fechamento. Adicionado também o indicador 'Realizadas' (cirurgias já ocorridas no mês vigente, sem contar reagendamentos/cancelamentos) em todos os painéis de KPI — geral e por filial — recalculado automaticamente a cada verificação. Ver histórico completo."
-const LAST_UPDATE_TS = "19/11/2026 12:30"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
+const LAST_UPDATE = "Ajuste de layout solicitado por Karina no chat: cards de indicadores (geral e das 3 filiais) reorganizados em formato de funil (Total Agendadas > Realizadas > Reagendadas > Canceladas > Próxima Semana). Nenhum dado de cirurgia foi alterado nesta atualização."
+const LAST_UPDATE_TS = "19/11/2026 13:57"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
 
 const TODAY = "2026-11-19";
 
@@ -1617,6 +1630,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"19/11/2026 13:57",author:"Sistema (ajuste solicitado por Karina no chat)",type:"Ajuste de layout: cards de indicadores em formato de funil",msg:"Karina solicitou reorganizar os cards de indicadores (KPIs) em formato de funil, na ordem: Total Agendadas > Realizadas > Reagendadas > Canceladas > Próxima Semana. Aplicado no painel geral (aba Agenda) e nos 3 painéis de filial (Capi Hair/Botafogo, TG Barra, TG Goiânia). Criado componente visual de funil (renderFunnel) com setas/chevrons coloridos por etapa, reaproveitando as cores já existentes (azul, verde, amarelo, vermelho, roxo). Nenhum dado de cirurgia foi alterado nesta atualização — apenas layout/apresentação dos indicadores."},
 {ts:"19/11/2026 12:30",author:"Sistema (verificação automática agendada)",type:"Verificação dos 4 grupos (Botafogo+Dezembro, Closeres, Barra, Goiânia) + novo indicador 'Realizadas' em todos os KPIs",msg:"Verificação automática agendada em 19/11/2026 12:30, checando os 4 grupos obrigatórios desde o checkpoint anterior (19/11 11:40). (1) Grupo 'AGENDA TC BOTAFOGO NOVEMBRO': repostagem completa integral de hoje (10:57) comparada dia a dia contra o array publicado — novo paciente Jose Fernando da Silva incluído no dia 19/11 (13.900 pix, staff A), confirmado pela mensagem curta de ontem 17:42 'Incluindo amanhã com 03' (id 1323); Rodrigo Marques da Silva, que tinha registro pendente/ambíguo em 18/11 (id 1303) e também aparecia no dia 24/11 na repostagem anterior, teve a pendência resolvida — a repostagem de hoje não traz mais o paciente no dia 18/11, confirmando reagendamento para 24/11 (id 1303 virou Reagendado/activeCount:false; novo registro ativo id 1324 criado no dia 24/11); Rodolfo Assis Lopes, Reagendado desde 14/11 (id 1276) sem nova data confirmada, apareceu no dia 23/11 na repostagem de hoje, confirmado pela mensagem curta 'Incluindo paciente da Luana segunda-feira' (novo registro ativo id 1325); Mauro dittz (id 1289, 28/11) desapareceu da repostagem sem mensagem explícita — tratado como cancelamento silencioso (Cancelado/activeCount:false), mesmo padrão já usado para casos semelhantes em agosto/2026. (2) Grupo 'AGENDA TC BOTAFOGO DEZEMBRO 26': repostagem editada ontem 16:33 trouxe novo paciente Marcos Felipe Torquato no dia 02/12 (18.900 à vista, staff JP/L), confirmado pela mensagem curta 'Dia 02 com 1 cirurgia' (novo registro id 1326); demais dias conferem com o já publicado. (3) Grupo 'Closeres': sem relatório novo de fechamento desde o checkpoint — apenas mensagens de voz/conversa geral sobre política de garantia, sem campo 'Fechamentos (transplante)'. (4) Grupo 'AGENDA TC BARRA': sem novos pacientes/cancelamentos; identificada pendência não resolvida da verificação anterior — Eduardo Barroso (id 2110, 05/12) tinha mensagem curta 'Dia 05 ok' (18/11 17:16) ainda não refletida no status; corrigido para Confirmado, mesmo padrão já usado para Vinicius Fernandes de Oliveira ('Dia 14 ok'). (5) Grupo 'AGENDA TC GOIÂNIA': releitura da repostagem de Novembro confirmou que a linha de Ralf Silva dos Santos (id 3137, 19/11) já trazia o emoji Pg✅, despercebido na verificação anterior — corrigido para Confirmado; repostagem de Dezembro (editada hoje 10:00, legenda 'Alterando paciente 16/12') é a terceira repostagem consecutiva sem José Gilmar Pires da Silva no dia 29/12, mantendo Sérgio Costa e Souza no lugar — pendência registrada em 16/11 resolvida por persistência (id 3135 virou Cancelado/activeCount:false; novo registro ativo id 3150 criado). (6) Melhoria solicitada por Karina: adicionado o indicador 'Realizadas' em todos os painéis de KPI (geral/Agenda, Capi Hair Botafogo, TG Barra, TG Goiânia) — conta as cirurgias do mês vigente com data já passada (<=TODAY), excluindo Reagendado/Cancelado e registros com activeCount:false; recalculado automaticamente a cada carregamento/verificação, sem necessidade de ajuste manual. Validação: sintaxe do <script> extraído verificada sem erro via new Function(); nenhum id duplicado introduzido nesta verificação (ids novos: 1323-1326 em Botafogo, 3150 em Goiânia — todos acima do maior id já usado em cada filial); activeCount:false confirmado em todos os registros Reagendado/Cancelado alterados; nenhum salesReports alterado nesta execução. Publicado via editor GitHub (CodeMirror), commit direto na branch principal."},
 {ts:"19/11/2026 11:40",author:"Sistema (verificação manual solicitada por Karina)",type:"Correção de datas (Fabi/Luana), novos relatórios (Assucena/João) e resolução de pendência Barra (cancelamentos id 2107 e id 2108)",msg:"Verificação manual solicitada por Karina em 19/11/2026 11:40 (correção de dados recém-publicados). (1) Relatório de Luana Melo (Closeres) datado 17/11 estava com data errada — corrigido para 18/11 a pedido de Karina (relatório reenviado por Luana com a data corrigida). (2) Relatório de Fabi Mazzoleni (Closeres) datado 17/11 estava com data errada — corrigido para 18/11 a pedido de Karina (relatório reenviado por Fabi com a data corrigida). (3) Assucena Closer Capi Hair reenviou o relatório completo do dia 17/11 (3 fechamentos: Bernard, Carlos e Raphael — não apenas 1 como registrado antes); Raphael tem correspondência confirmada com a cirurgia id 1321 (Raphael Souza, 24/11, 10k, segundo transplante). Bernard e Carlos sem correspondência encontrada na agenda (Carlos com valor divergente do registro id 1300). (4) Assucena enviou novo relatório do dia 18/11 (Henrique/Jordana, Guilherme/Luana — sem correspondência na agenda; Tiago/Luana não fechado, sem dinheiro). (5) João Pedro Closer Capi Hair enviou relatório do dia 18/11 (Marcos Felipe/Luana — sem correspondência; Reginaldo/Luana — correspondência confirmada com a cirurgia id 1322, Reginaldo Lopes Barbosa, 25/11, 13.300 em 12x). (6) Pendência da Barra resolvida por confirmação direta de Karina: Antônio Diego Rocha (id 2107, 19/12) cancelado — paciente afastado do trabalho pelo INSS, sem condições de realizar a cirurgia; Marcelo Lacôrte Soares (id 2108, 21/12) cancelado — paciente cancelou e solicitou estorno. Ambos marcados status:\"Cancelado\", activeCount:false. Validação: sem ids duplicados nos arrays alterados; activeCount:false consistente em todos os registros Reagendado/Cancelado mantidos apenas para auditoria; closedTransplante <= closed em todos os salesReports (incluindo os 4 alterados/novos: Luana, Fabi, Assucena x2, João); sintaxe do <script> validada com sucesso antes da publicação."},
 {ts:"19/11/2026 10:35",author:"Sistema (verificação automática agendada)",type:"Closeres: 2 relatórios retroativos novos (Luana e Fabi, 17/11) | Barra Dez: +2 pacientes (Eduardo Barroso 05/12, Vinicius F. Oliveira 14/12) + pendência de 2 sumiços (Antônio Diego Rocha 19/12, Marcelo Lacôrte 21/12) | Goiânia Dez: troca Alexandre Rechi Pires por João Tielles (16/12)",msg:"Verificação automática agendada, disparada às 19/11/2026 13:14 UTC (~10:14 BRT). Checkpoint anterior: LAST_UPDATE_TS publicado em 18/11/2026 18:05 (mas este era de uma correção manual pontual sobre o dia 21/11 em Botafogo; o último sweep completo e automático das 4 fontes obrigatórias havia sido às 18/11/2026 10:07, 'sem novidades'). Esta execução revarreu as 4 fontes via Claude in Chrome (WhatsApp Web) cobrindo o intervalo entre 18/11 10:07 e agora. (1) AGENDA TC BOTAFOGO NOVEMBRO: última mensagem do grupo é de ontem (18/11) às 17:42 ('Pré operatorio Capi Hair Plus': 'Incluindo amanhã com 03'), anterior ao checkpoint de 18:05 já publicado — nenhuma mensagem nova. (2) Closeres: revisão completa do histórico de mensagens desde 18/11 10:07 encontrou 2 relatórios de vendas retroativos para o dia 17/11 que não constavam em salesReports: 'Relatório Luana GO 17/11/26' (enviado 18/11 17:39, Fechamentos transplante: 2 — Fernando/Waleska 18.900 e João Tielles/ind 13.990, mais 1 tratamento — Paulo José renovação 3k; Antonio e Adenilson em negociação, não fechados) e 'Relatório 17/11' de Fabi Closer Capi Hair Barra (enviado 18/11 17:40, Fechamento: 2 — Jackson/Luana 13.900 10x e Eduardo/Luana 12k sinal 1k). Ambos são atualizações/segundos relatórios do mesmo dia 17/11 — já existiam relatórios anteriores de Luana e de Fabi para 17/11 com conteúdo totalmente distinto (Rodrigo/Waleska e Cristian Clayton, respectivamente, ambos ts 17/11 17:35); como o conteúdo é inteiramente diferente, ambos os novos relatórios foram adicionados como entradas separadas em salesReports, sem sobrescrever os anteriores. Também notei mensagens de 'Mensagem apagada' e pedidos administrativos da Vanessa (CEO) sobre indicações — não geram registro. Cruzamento com as agendas: João Tielles (Luana, 13.990) bate exatamente com a nova inclusão em Goiânia Dezembro dia 16/12 (ver item 4); Eduardo (Fabi, 12k sinal 1k, equipe Lu) bate exatamente com a nova inclusão em Barra Dezembro dia 05/12 (Eduardo Barroso, ver item 3); Jackson (Fabi) e Fernando (Luana) ficaram sem correspondência óbvia na agenda — pendência registrada nas notas dos relatórios. (3) AGENDA TC BARRA: comparação dia a dia da repostagem completa integral mais recente de 'DEZEMBRO BARRA' (Fabi Closer Capi Hair Barra, duas versões de ontem 18/11 — 14:46 e a final às 17:16, cada uma confirmada por mensagem curta 'Dia 14 ok' e 'Dia 05 ok' respectivamente) contra o array publicado encontrou: (a) dia 05/12 passou a trazer 'Eduardo Barroso 12k (Fabi e Lu)', antes vazio — novo registro id 2110, Agendado (sem ✅), com correspondência confirmada ao relatório de vendas de Fabi (ver item 2); (b) dia 14/12 passou a trazer 'Vinicius Fernandes de Oliveira 23k✅ (Fabi)', antes vazio — novo registro id 2111, Confirmado (✅ presente); (c) os pacientes Antônio Diego Rocha (19/12, id 2107) e Marcelo Lacôrte Soares (21/12, id 2108), antes presentes, não aparecem mais em nenhum dia da repostagem mais recente, sem nenhuma mensagem curta explícita de cancelamento ou remanejamento e sem nenhum paciente novo ocupando esses dias — por ambiguidade (sem confirmação nominal explícita), ambos mantidos Agendado inalterados, com pendência registrada nas respectivas obs, aguardando confirmação de Karina ou nova mensagem do grupo. (4) AGENDA TC GOIÂNIA: revisão da repostagem completa integral de NOVEMBRO 2026 de ontem (18/11, 14:39) confirmou que a atualização de forma de pagamento do dia 19/11 (Ralf Silva dos Santos, 6x→10x, 'Pg') e o preenchimento do dia 30/11 (Rodrigo Mendes dos Santos) já haviam sido processados em verificação manual anterior solicitada por Karina no mesmo dia — nenhuma ação adicional necessária aqui. A repostagem completa integral de DEZEMBRO 2026, reenviada hoje (19/11) às 10:00 (mensagem editada), trouxe no dia 16/12 um novo paciente 'João Tielles 13.990 em 10X (Lu)' no lugar de Alexandre Rechi Pires (id 3126), confirmado pela mensagem curta da mesma autora e horário: 'Alterando paciente 16/12' — alteração deliberada e explícita, não ambígua. Alexandre Rechi Pires marcado Cancelado com activeCount:false (mantido para auditoria); novo registro id 3149 criado para João Tielles, com correspondência confirmada ao relatório de vendas de Luana (ver item 2). Reconferido também o dia 29/12: a repostagem mais recente continua trazendo 'Sérgio Costa e Souza' no lugar de José Gilmar Pires da Silva (id 3135) — já é a segunda repostagem completa consecutiva com esta troca (a primeira foi em 16/11), mas segue sem nenhuma mensagem curta explícita confirmando a troca deste dia específico; mantido José Gilmar inalterado por ambiguidade, pendência reforçada na obs do registro, aguardando confirmação de Karina. Mensagem 'Mensagem apagada' (hoje 09:50) não gerou nenhuma ação (conteúdo indisponível). TODAY avançado para 2026-11-19, pois as 4 fontes obrigatórias foram verificadas nesta mesma execução. Validação programática antes da publicação: nenhum id duplicado nos arrays alterados (surgeriesBarraDezembro, surgeriesGoianiaDezembro, salesReports), todo registro Reagendado/Cancelado do mês com activeCount:false quando mantido apenas para auditoria (exceção deliberada: Antônio Diego Rocha e Marcelo Lacôrte Soares mantidos Agendado, não Cancelado, por decisão explícita de manter ambiguidade sem eliminação), closedTransplante <= closed em ambos os novos salesReports, e sintaxe do bloco <script> validada com sucesso antes do commit."},
@@ -2224,6 +2238,12 @@ function renderHeatmapGoianiaDezembro(){ renderHeatmapGeneric('heatmapGoianiaDez
 // KPIs por filial (mesmos 7 cards do topo do dashboard — ver renderKPIs() — só que calculados a partir do
 // array combinado da própria filial, não de allSurgeries, para manter TG Barra/TG Goiânia independentes
 // dos totais de Botafogo.
+function renderFunnel(elId, stages){
+  const target = document.getElementById(elId);
+  if(!target) return;
+  target.className = "kpi-funnel";
+  target.innerHTML = stages.map(s=>`<div class="funnel-step fn-${s.c}"><div class="v">${s.v}</div><div class="l">${s.l}</div></div>`).join("");
+}
 function renderKPIsGeneric(elId, arr){
   // Cards mostram números absolutos apenas do mês vigente de TODAY (filtro dinâmico, sem valor fixo —
   // atualiza automaticamente conforme TODAY avança em cada verificação).
@@ -2241,15 +2261,14 @@ function renderKPIsGeneric(elId, arr){
   const resched = monthArr.filter(s=>s.status==="Reagendado").length;
   const realizadas = monthArr.filter(s=>s.date<=TODAY&&s.status!=="Cancelado"&&s.status!=="Reagendado"&&s.activeCount!==false).length;
   const kpis = [
-    {v:total,l:"Total de Cirurgias",c:"ink"},
+    {v:total,l:"Total Agendadas",c:"ink"},
     {v:realizadas,l:"Realizadas",c:"green"},
-    {v:weekCount,l:"Cirurgias da Semana",c:"blue"},
-    {v:nextWeekCount,l:"Próxima Semana",c:"blue"},
-    {v:cancel,l:"Cancelamentos",c:"red"},
-    {v:resched,l:"Reagendamentos",c:"yellow"}
+    {v:resched,l:"Reagendadas",c:"yellow"},
+    {v:cancel,l:"Canceladas",c:"red"},
+    {v:nextWeekCount,l:"Próxima Semana",c:"blue"}
   ];
-  const target = document.getElementById(elId);
-  if(target) target.innerHTML = kpis.map(k=>`<div class="kpi c-${k.c}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+  renderFunnel(elId, kpis);
+  void weekCount;
 }
 // Tabela de pacientes reutilizável (mesmo formato de renderAgostoList()), parametrizada por array e elemento alvo.
 function renderListGeneric(elId, arr){
@@ -2302,14 +2321,14 @@ function renderKPIs(){
   const resched = monthSurgeries.filter(s=>s.status==="Reagendado").length;
   const realizadas = monthSurgeries.filter(s=>s.date<=TODAY&&s.status!=="Cancelado"&&s.status!=="Reagendado"&&s.activeCount!==false).length;
   const kpis = [
-    {v:total,l:"Total de Cirurgias",c:"ink"},
-    {v:realizadas,l:"Realizadas",c:"green"},
-    {v:weekCount,l:"Cirurgias da Semana",c:"blue"},
-    {v:nextWeekCount,l:"Próxima Semana",c:"blue"},
-    {v:cancel,l:"Cancelamentos",c:"red"},
-    {v:resched,l:"Reagendamentos",c:"yellow"}
-  ];
-  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`<div class="kpi c-${k.c}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join('');
+      {v:total,l:"Total Agendadas",c:"ink"},
+      {v:realizadas,l:"Realizadas",c:"green"},
+      {v:resched,l:"Reagendadas",c:"yellow"},
+      {v:cancel,l:"Canceladas",c:"red"},
+      {v:nextWeekCount,l:"Próxima Semana",c:"blue"}
+    ];
+    renderFunnel('kpiRow', kpis);
+    void weekCount;
 }
 
 // ---------------- SIDEBAR ----------------
