@@ -306,14 +306,15 @@ tr:last-child td{border-bottom:none;}
           </div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3>Ocupação novembro — mês corrente (em andamento) — capacidade de 3 cirurgias/dia</h3></div>
+          <div class="panel-head"><h3>Ocupação novembro — mês corrente (em andamento) — capacidade de 3 cirurgias/dia até 22/11, 2 cirurgias/dia a partir de 23/11 (ajuste solicitado por Karina)</h3></div>
           <div id="heatmapNovembro"></div>
           <div class="badge-legend">
             <span><span class="dot" style="background:var(--red)"></span>Vermelho — 0 cirurgias</span>
-            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — 1 cirurgia</span>
-            <span><span class="dot" style="background:var(--blue)"></span>Azul — 2 cirurgias</span>
-            <span><span class="dot" style="background:var(--green)"></span>Verde — 3 cirurgias (lotado)</span>
+            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — ocupação parcial baixa</span>
+            <span><span class="dot" style="background:var(--blue)"></span>Azul — ocupação parcial alta</span>
+            <span><span class="dot" style="background:var(--green)"></span>Verde — dia lotado (capacidade do dia)</span>
           </div>
+          <div class="empty-note">A partir de 23/11/2026, a capacidade diária de Botafogo passa de 3 para 2 cirurgias/dia (ajuste solicitado por Karina) — passe o mouse sobre cada célula para ver a capacidade exata daquele dia.</div>
           <div class="empty-note">Fonte: grupo de WhatsApp "AGENDA TC BOTAFOGO NOVEMBRO" · mês corrente — conferido em 03/11/2026 12:05 (verificação manual solicitada por Karina); sujeito a novas inclusões/alterações · Contagem calculada em tempo real a partir dos dados reais por paciente abaixo.</div>
         </div>
         <div class="panel" id="octoberHeatmapPanel" style="display:none;">
@@ -328,13 +329,12 @@ tr:last-child td{border-bottom:none;}
           <div class="empty-note">Fonte: grupo de WhatsApp "AGENDA TC BOTAFOGO OUTUBRO" · mês encerrado — grupo/mês congelado desde a virada para Novembro (03/11/2026); exibido abaixo de Novembro apenas para consulta · Contagem calculada em tempo real a partir dos dados reais por paciente abaixo.</div>
         </div>
         <div class="panel">
-          <div class="panel-head"><h3>Ocupação dezembro — mês projetado (ainda não iniciado) — capacidade de 3 cirurgias/dia</h3></div>
+          <div class="panel-head"><h3>Ocupação dezembro — mês projetado (ainda não iniciado) — capacidade de 2 cirurgias/dia (ajustada de 3 para 2 a partir de 23/11/2026, a pedido de Karina)</h3></div>
           <div id="heatmapDezembro"></div>
           <div class="badge-legend">
             <span><span class="dot" style="background:var(--red)"></span>Vermelho — 0 cirurgias</span>
-            <span><span class="dot" style="background:var(--yellow)"></span>Amarelo — 1 cirurgia</span>
-            <span><span class="dot" style="background:var(--blue)"></span>Azul — 2 cirurgias</span>
-            <span><span class="dot" style="background:var(--green)"></span>Verde — 3 cirurgias (lotado)</span>
+            <span><span class="dot" style="background:var(--blue)"></span>Azul — 1 cirurgia</span>
+            <span><span class="dot" style="background:var(--green)"></span>Verde — 2 cirurgias (lotado)</span>
           </div>
           <div class="empty-note">Fonte: grupo de WhatsApp "AGENDA TC BOTAFOGO DEZEMBRO 26" (grupo novo, criado em 16/11/2026 por João Pedro Closer Capi Hair) · primeira leitura em 18/11/2026, a pedido de Karina ("ocultar outubro e trazer a projeção de dezembro das 3 filiais") · repostagem completa integral mais recente: 17/11/2026 15:08 (Assucena Closer Capi Hair) · mês ainda não iniciado (projeção sujeita a alterações até a virada de TODAY para dezembro/2026) · dias 23 (evento), 24 (recesso) e 25 (Natal) sem expediente cirúrgico e dia 31 fechado, conforme a própria repostagem · Contagem calculada em tempo real a partir dos dados reais por paciente na tabela abaixo.</div>
         </div>
@@ -641,8 +641,8 @@ tr:last-child td{border-bottom:none;}
 })();
 
 // ---------------- DATA ----------------
-const LAST_UPDATE = "Ajuste de layout solicitado por Karina no chat: cards de indicadores (geral e das 3 filiais) reorganizados em formato de funil (Total Agendadas > Realizadas > Reagendadas > Canceladas > Próxima Semana). Nenhum dado de cirurgia foi alterado nesta atualização."
-const LAST_UPDATE_TS = "19/11/2026 13:57"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
+const LAST_UPDATE = "Ajuste de capacidade solicitado por Karina no chat: a partir de 23/11/2026, a capacidade diária do centro cirúrgico de Botafogo passa de 3 para 2 cirurgias/dia no heatmap de ocupação (dias antes de 23/11 continuam contando com capacidade 3). A meta de vendas (Volume de Vendas, DAILY_SALES_GOAL/BRANCH_GOALS/monthlySalesCapacity) foi mantida inalterada, conforme pedido explícito de Karina."
+const LAST_UPDATE_TS = "23/11/2026 09:37"// Exibido no topo do dashboard - somente data e hora (o texto completo acima fica so para auditoria/historico)
 
 const TODAY = "2026-11-19";
 
@@ -1630,6 +1630,7 @@ function salesDayStatus(dateKey, byDateMap){
 }
 
 const history = [
+{ts:"23/11/2026 09:37",author:"Sistema (ajuste solicitado por Karina no chat)",type:"Ajuste de capacidade — heatmap de ocupação de Botafogo passa de 3 para 2 cirurgias/dia a partir de 23/11/2026",msg:"Karina pediu no chat: 'preciso realizar algumas atualizações, atualize o heatmap, apartir de 23/11 contar a ocupação com 2 cirurgias em botafogo. Porem a meta de vendas permenece a msm'. IMPLEMENTAÇÃO: criada constante BOTAFOGO_CAPACITY_CHANGE_DATE='2026-11-23' e função botafogoCapacityFor(dateKey) (retorna 2 para dateKey>='2026-11-23', senão 3). computeOpenSlots() (vagas em aberto exibidas na aba Agenda) passou a usar botafogoCapacityFor(d) em vez do valor fixo 3. renderHeatmapGeneric(elId, arr, year, monthIdx, daysInMonth, capacityPerDay, opts) foi generalizada para aceitar capacityPerDay como função além de número fixo (nova função resolveCapacity), usada célula a célula (cor, selo '-N*' e tooltip 'X de Y cirurgia(s)') e na capacidade semanal de cada linha do heatmap (tomada do primeiro dia real da semana × 6, preservando exatamente o comportamento anterior para semanas parciais quando a capacidade é um número fixo — validado programaticamente que isso não alterou nenhum outro heatmap). renderHeatmapNovembro() e renderHeatmapDezembro() passaram a chamar renderHeatmapGeneric(..., botafogoCapacityFor) em vez do literal 3; novembro agora mostra capacidade 3 até 22/11 e 2 a partir de 23/11 (a virada cai exatamente no início da semana S4, sem quebra no meio de uma semana), dezembro inteiro passa a usar capacidade 2. Títulos dos painéis 'Ocupação novembro' e 'Ocupação dezembro' atualizados para refletir a nova regra, com nota explicativa; legendas de cor tornadas genéricas (sem número fixo) nesses dois painéis, já que a capacidade agora varia dentro do mesmo heatmap de novembro. NÃO alterado: Outubro, Agosto, Setembro, Julho, TG Barra e TG Goiânia (capacidade constante, fora do escopo do pedido) e a aba Volume de Vendas inteira (DAILY_SALES_GOAL, BRANCH_GOALS, monthlySalesCapacity, salesBusinessDaysInMonth) — meta de vendas mantida exatamente como estava, por pedido explícito de Karina ('a meta de vendas permanece a msm'). Nenhum dado de cirurgia ou venda foi alterado; só lógica/exibição de capacidade de ocupação. VALIDAÇÃO antes de publicar: bloco <script> testado com new Function (sem erro de sintaxe); script completo executado em ambiente simulado Node+jsdom com Chart.js stubado, chamando renderHeatmapNovembro/Dezembro/Outubro/Barra*/Goiania* sem exceção; comparação HTML byte-a-byte confirmando que heatmapOutubro, heatmapAgosto, heatmapSetembro, heatmap (julho), e todos os heatmaps de TG Barra/TG Goiânia (Agosto a Dezembro) ficaram IDÊNTICOS antes/depois da mudança; heatCellClass/resolveCapacity testados isoladamente (cap=3: 0,1,2,3→h0,h1,h2,h3; cap=2: 0,1,2→h0,h2,h3); confirmado que o dia 23/11 (3 cirurgias já agendadas, nova capacidade 2) fica corretamente 'lotado'/sem vaga em aberto em vez de gerar erro ou número negativo; monthlySalesCapacity(2026,10,30) conferido idêntico antes/depois (25 dias úteis, total 150, Botafogo 75/Barra 25/Goiânia 50); arrays de dados (surgeriesNovembro/Dezembro/Barra*/Goiania*, salesReports) conferidos byte-a-byte idênticos ao commit anterior. Observação para Karina: o dia 23/11/2026 já tinha 3 cirurgias agendadas antes deste ajuste; com a nova capacidade de 2, esse dia aparece como 'lotado' (verde) mesmo estando acima da nova capacidade — nenhuma cirurgia foi cancelada ou alterada, é só o indicador visual que passou a tratar esse dia como cheio. Publicado via editor CodeMirror do GitHub, commit direto na branch main."},
 {ts:"19/11/2026 13:57",author:"Sistema (ajuste solicitado por Karina no chat)",type:"Ajuste de layout: cards de indicadores em formato de funil",msg:"Karina solicitou reorganizar os cards de indicadores (KPIs) em formato de funil, na ordem: Total Agendadas > Realizadas > Reagendadas > Canceladas > Próxima Semana. Aplicado no painel geral (aba Agenda) e nos 3 painéis de filial (Capi Hair/Botafogo, TG Barra, TG Goiânia). Criado componente visual de funil (renderFunnel) com setas/chevrons coloridos por etapa, reaproveitando as cores já existentes (azul, verde, amarelo, vermelho, roxo). Nenhum dado de cirurgia foi alterado nesta atualização — apenas layout/apresentação dos indicadores."},
 {ts:"19/11/2026 12:30",author:"Sistema (verificação automática agendada)",type:"Verificação dos 4 grupos (Botafogo+Dezembro, Closeres, Barra, Goiânia) + novo indicador 'Realizadas' em todos os KPIs",msg:"Verificação automática agendada em 19/11/2026 12:30, checando os 4 grupos obrigatórios desde o checkpoint anterior (19/11 11:40). (1) Grupo 'AGENDA TC BOTAFOGO NOVEMBRO': repostagem completa integral de hoje (10:57) comparada dia a dia contra o array publicado — novo paciente Jose Fernando da Silva incluído no dia 19/11 (13.900 pix, staff A), confirmado pela mensagem curta de ontem 17:42 'Incluindo amanhã com 03' (id 1323); Rodrigo Marques da Silva, que tinha registro pendente/ambíguo em 18/11 (id 1303) e também aparecia no dia 24/11 na repostagem anterior, teve a pendência resolvida — a repostagem de hoje não traz mais o paciente no dia 18/11, confirmando reagendamento para 24/11 (id 1303 virou Reagendado/activeCount:false; novo registro ativo id 1324 criado no dia 24/11); Rodolfo Assis Lopes, Reagendado desde 14/11 (id 1276) sem nova data confirmada, apareceu no dia 23/11 na repostagem de hoje, confirmado pela mensagem curta 'Incluindo paciente da Luana segunda-feira' (novo registro ativo id 1325); Mauro dittz (id 1289, 28/11) desapareceu da repostagem sem mensagem explícita — tratado como cancelamento silencioso (Cancelado/activeCount:false), mesmo padrão já usado para casos semelhantes em agosto/2026. (2) Grupo 'AGENDA TC BOTAFOGO DEZEMBRO 26': repostagem editada ontem 16:33 trouxe novo paciente Marcos Felipe Torquato no dia 02/12 (18.900 à vista, staff JP/L), confirmado pela mensagem curta 'Dia 02 com 1 cirurgia' (novo registro id 1326); demais dias conferem com o já publicado. (3) Grupo 'Closeres': sem relatório novo de fechamento desde o checkpoint — apenas mensagens de voz/conversa geral sobre política de garantia, sem campo 'Fechamentos (transplante)'. (4) Grupo 'AGENDA TC BARRA': sem novos pacientes/cancelamentos; identificada pendência não resolvida da verificação anterior — Eduardo Barroso (id 2110, 05/12) tinha mensagem curta 'Dia 05 ok' (18/11 17:16) ainda não refletida no status; corrigido para Confirmado, mesmo padrão já usado para Vinicius Fernandes de Oliveira ('Dia 14 ok'). (5) Grupo 'AGENDA TC GOIÂNIA': releitura da repostagem de Novembro confirmou que a linha de Ralf Silva dos Santos (id 3137, 19/11) já trazia o emoji Pg✅, despercebido na verificação anterior — corrigido para Confirmado; repostagem de Dezembro (editada hoje 10:00, legenda 'Alterando paciente 16/12') é a terceira repostagem consecutiva sem José Gilmar Pires da Silva no dia 29/12, mantendo Sérgio Costa e Souza no lugar — pendência registrada em 16/11 resolvida por persistência (id 3135 virou Cancelado/activeCount:false; novo registro ativo id 3150 criado). (6) Melhoria solicitada por Karina: adicionado o indicador 'Realizadas' em todos os painéis de KPI (geral/Agenda, Capi Hair Botafogo, TG Barra, TG Goiânia) — conta as cirurgias do mês vigente com data já passada (<=TODAY), excluindo Reagendado/Cancelado e registros com activeCount:false; recalculado automaticamente a cada carregamento/verificação, sem necessidade de ajuste manual. Validação: sintaxe do <script> extraído verificada sem erro via new Function(); nenhum id duplicado introduzido nesta verificação (ids novos: 1323-1326 em Botafogo, 3150 em Goiânia — todos acima do maior id já usado em cada filial); activeCount:false confirmado em todos os registros Reagendado/Cancelado alterados; nenhum salesReports alterado nesta execução. Publicado via editor GitHub (CodeMirror), commit direto na branch principal."},
 {ts:"19/11/2026 11:40",author:"Sistema (verificação manual solicitada por Karina)",type:"Correção de datas (Fabi/Luana), novos relatórios (Assucena/João) e resolução de pendência Barra (cancelamentos id 2107 e id 2108)",msg:"Verificação manual solicitada por Karina em 19/11/2026 11:40 (correção de dados recém-publicados). (1) Relatório de Luana Melo (Closeres) datado 17/11 estava com data errada — corrigido para 18/11 a pedido de Karina (relatório reenviado por Luana com a data corrigida). (2) Relatório de Fabi Mazzoleni (Closeres) datado 17/11 estava com data errada — corrigido para 18/11 a pedido de Karina (relatório reenviado por Fabi com a data corrigida). (3) Assucena Closer Capi Hair reenviou o relatório completo do dia 17/11 (3 fechamentos: Bernard, Carlos e Raphael — não apenas 1 como registrado antes); Raphael tem correspondência confirmada com a cirurgia id 1321 (Raphael Souza, 24/11, 10k, segundo transplante). Bernard e Carlos sem correspondência encontrada na agenda (Carlos com valor divergente do registro id 1300). (4) Assucena enviou novo relatório do dia 18/11 (Henrique/Jordana, Guilherme/Luana — sem correspondência na agenda; Tiago/Luana não fechado, sem dinheiro). (5) João Pedro Closer Capi Hair enviou relatório do dia 18/11 (Marcos Felipe/Luana — sem correspondência; Reginaldo/Luana — correspondência confirmada com a cirurgia id 1322, Reginaldo Lopes Barbosa, 25/11, 13.300 em 12x). (6) Pendência da Barra resolvida por confirmação direta de Karina: Antônio Diego Rocha (id 2107, 19/12) cancelado — paciente afastado do trabalho pelo INSS, sem condições de realizar a cirurgia; Marcelo Lacôrte Soares (id 2108, 21/12) cancelado — paciente cancelou e solicitou estorno. Ambos marcados status:\"Cancelado\", activeCount:false. Validação: sem ids duplicados nos arrays alterados; activeCount:false consistente em todos os registros Reagendado/Cancelado mantidos apenas para auditoria; closedTransplante <= closed em todos os salesReports (incluindo os 4 alterados/novos: Luana, Fabi, Assucena x2, João); sintaxe do <script> validada com sucesso antes da publicação."},
@@ -2028,12 +2029,21 @@ const history = [
 {"ts":"14/08 16:13","author":"Sistema (verificação automática)","type":"Verificação sem novidades","msg":"Execução automática agendada (a cada 2h em dias úteis). Extensão Claude in Chrome conectada, WhatsApp Web acessado normalmente, sem tela de bloqueio do app. Grupo 'AGENDA TC BOTAFOGO AGOSTO' relido — última mensagem continua sendo a repostagem completa de hoje 14:23 (João Pedro Closer Capi Hair, 'Dia 19 com 2'), já processada na verificação de 14:39; sem mensagens novas. Grupo 'Closeres' relido — última mensagem continua sendo a de hoje 10:24 (João Pedro Closer Capi Hair, '13/08*'), já processada; sem relatórios novos. Grupo 'AGENDA TC BOTAFOGO JULHO' não verificado (fora da rotina desde 14/08). Nenhuma alteração em surgeries/surgeriesAgosto/salesReports nesta execução. Pendências já registradas (relatório ambíguo de João Pedro de 10/08 18:37, relatórios ausentes de João Pedro em 01/08 e 03/08, possível 4º paciente no dia 22/08 de Agosto, data exata de setembro para Felipe Cimino) permanecem em aberto."}
 ];
 
-// Vagas em aberto por dia — calculado dinamicamente (capacidade de 3 cirurgias/dia menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
+// Capacidade diária de Botafogo por data (ajuste solicitado por Karina no chat, 23/11/2026): a partir de
+// 23/11/2026 (inclusive) a capacidade do centro cirúrgico de Botafogo passa de 3 para 2 cirurgias/dia; antes
+// dessa data permanece 3. Usada em computeOpenSlots() e em renderHeatmapGeneric() (via renderHeatmapNovembro/
+// renderHeatmapDezembro) para colorir células, exibir "-N*" e exibir vagas em aberto. NÃO afeta a meta de vendas
+// (DAILY_SALES_GOAL/BRANCH_GOALS/monthlySalesCapacity), que permanece inalterada por pedido explícito de Karina.
+const BOTAFOGO_CAPACITY_CHANGE_DATE = "2026-11-23";
+function botafogoCapacityFor(dateKey){
+  return dateKey >= BOTAFOGO_CAPACITY_CHANGE_DATE ? 2 : 3;
+}
+// Vagas em aberto por dia — calculado dinamicamente (capacidade diária de Botafogo, ver botafogoCapacityFor, menos cirurgias ativas, excluindo Canceladas). Substitui o mapa estático anterior, que ficava desatualizado a cada inclusão/cancelamento.
 function computeOpenSlots(){
   const counts = {};
   allSurgeries.forEach(s=>{ if(s.status!=="Cancelado" && s.activeCount!==false){ counts[s.date]=(counts[s.date]||0)+1; } });
   const slots = {};
-  Object.keys(counts).forEach(d=>{ const open = 3-counts[d]; if(open>0) slots[d]=open; });
+  Object.keys(counts).forEach(d=>{ const open = botafogoCapacityFor(d)-counts[d]; if(open>0) slots[d]=open; });
   return slots;
 }
 const openSlots = computeOpenSlots();
@@ -2157,13 +2167,18 @@ function heatCellClass(count, capacity){
   const third = capacity/3;
   return count<=third ? 'h1' : 'h2';
 }
+// capacityPerDay aceita um número fixo (comportamento original) OU uma função (dateKey)=>número, para suportar
+// capacidade diária variável por data (ex.: Botafogo a partir de 23/11/2026, ver botafogoCapacityFor). resolveCapacity
+// mantém compatibilidade total com todas as chamadas existentes que passam um número fixo.
+function resolveCapacity(capacityPerDay, dateKey){
+  return typeof capacityPerDay === 'function' ? capacityPerDay(dateKey) : capacityPerDay;
+}
 function renderHeatmapGeneric(elId, arr, year, monthIdx, daysInMonth, capacityPerDay, opts){
   opts = opts || {};
   const el = document.getElementById(elId);
   if(!el) return;
   const counts = computeCountsGeneric(arr);
   const cancelled = computeCancelledCounts(arr);
-  const weeklyCapacity = capacityPerDay*6;
   const weeks = [];
   let current = new Array(6).fill(null);
   // A pedido de Karina (26/08/2026): suporte a "herdar" o dia 31/08 (segunda-feira) na 1ª semana do heatmap de
@@ -2190,6 +2205,7 @@ function renderHeatmapGeneric(elId, arr, year, monthIdx, daysInMonth, capacityPe
   weeks.forEach((weekCells,w)=>{
     let weekTotal = 0;
     let weekMonday = null;
+    let weekCapacityRep = null;
     const dayCells = weekCells.map((d,i)=>{
       if(d===null) return `<div class="heat-cell blank"></div>`;
       if(typeof d==='object' && d.leadDate){
@@ -2198,20 +2214,25 @@ function renderHeatmapGeneric(elId, arr, year, monthIdx, daysInMonth, capacityPe
         const count = d.leadCount||0;
         const cancelledCount = d.leadCancelled||0;
         weekTotal += count;
-        const cls = heatCellClass(count, capacityPerDay);
+        const capToday = resolveCapacity(capacityPerDay, d.leadDate);
+        if(weekCapacityRep===null) weekCapacityRep = capToday;
+        const cls = heatCellClass(count, capToday);
         const dLabel = dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-        return `<div class="heat-cell ${cls}" title="${dLabel}: ${count} de ${capacityPerDay} cirurgia(s) (último dia útil de agosto)">${cancelBadgeHtml(cancelledCount, count, capacityPerDay)}<span class="d">${d.leadDay}</span><span class="c">${count}</span></div>`;
+        return `<div class="heat-cell ${cls}" title="${dLabel}: ${count} de ${capToday} cirurgia(s) (último dia útil de agosto)">${cancelBadgeHtml(cancelledCount, count, capToday)}<span class="d">${d.leadDay}</span><span class="c">${count}</span></div>`;
       }
       if(weekMonday===null){ const dt=new Date(year,monthIdx,d); dt.setDate(dt.getDate()-i); weekMonday=dt; }
       const key = `${year}-${String(monthIdx+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const count = counts[key]||0;
       const cancelledCount = cancelled[key]||0;
       weekTotal += count;
-      const cls = heatCellClass(count, capacityPerDay);
+      const capToday = resolveCapacity(capacityPerDay, key);
+      if(weekCapacityRep===null) weekCapacityRep = capToday;
+      const cls = heatCellClass(count, capToday);
       const cutCls = i===1 ? ' cut-line' : '';
       const dLabel = new Date(year,monthIdx,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-      return `<div class="heat-cell ${cls}${cutCls}" title="${dLabel}: ${count} de ${capacityPerDay} cirurgia(s)">${cancelBadgeHtml(cancelledCount, count, capacityPerDay)}<span class="d">${d}</span><span class="c">${count}</span></div>`;
+      return `<div class="heat-cell ${cls}${cutCls}" title="${dLabel}: ${count} de ${capToday} cirurgia(s)">${cancelBadgeHtml(cancelledCount, count, capToday)}<span class="d">${d}</span><span class="c">${count}</span></div>`;
     }).join('');
+    const weeklyCapacity = (weekCapacityRep!==null ? weekCapacityRep : resolveCapacity(capacityPerDay, `${year}-${String(monthIdx+1).padStart(2,'0')}-01`)) * 6;
     const pct = Math.round((weekTotal/weeklyCapacity)*100);
     const occCls = pct>=80 ? 'occ-high' : pct>=50 ? 'occ-mid' : 'occ-low';
     const occCell = `<div class="week-occ ${occCls}" title="${weekTotal} de ${weeklyCapacity} cirurgias (capacidade semanal)"><span>${pct}%</span><span class="pct-label">ocupação</span></div>`;
@@ -2814,8 +2835,8 @@ function renderHeatmapSetembro(){
   el.innerHTML = `<div class="heatmap-wrap">${headerHtml}${rowsHtml}</div>`;
 }
 function renderHeatmapOutubro(){ renderHeatmapGeneric('heatmapOutubro', surgeriesOutubro, 2026, 9, 31, 3); }
-function renderHeatmapNovembro(){ renderHeatmapGeneric('heatmapNovembro', surgeriesNovembro, 2026, 10, 30, 3); }
-function renderHeatmapDezembro(){ renderHeatmapGeneric('heatmapDezembro', surgeriesDezembro, 2026, 11, 31, 3); }
+function renderHeatmapNovembro(){ renderHeatmapGeneric('heatmapNovembro', surgeriesNovembro, 2026, 10, 30, botafogoCapacityFor); }
+function renderHeatmapDezembro(){ renderHeatmapGeneric('heatmapDezembro', surgeriesDezembro, 2026, 11, 31, botafogoCapacityFor); }
 
 
 function renderAgostoList(){
